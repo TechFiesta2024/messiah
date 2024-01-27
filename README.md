@@ -1,2 +1,8 @@
-# messiah
-Backend Repo
+```
+npm install
+npm run dev
+```
+
+```
+npm run deploy
+```
