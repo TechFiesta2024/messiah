@@ -4,11 +4,6 @@ import { workshops } from "./types/workshops";
 
 const app = new Hono();
 
-// TODO
-// 1. user registration
-// 2. CI/CD pipeline
-// 3. testing
-
 const demoWorkshops = workshops;
 const demoEvents = events;
 
