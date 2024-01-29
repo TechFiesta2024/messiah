@@ -1,5 +1,6 @@
 import { createClient } from "@libsql/client/web";
 import { Hono } from "hono";
+import { env } from "hono/adapter";
 import { v4 as uuidv4 } from "uuid";
 import { Ambassador } from "./types/ambassador";
 import { events } from "./types/events";
@@ -7,16 +8,18 @@ import { workshops } from "./types/workshops";
 
 const app = new Hono();
 
-const client = createClient({
-	url: "",
-	authToken: "",
-});
-
 app.get("/", (c) => {
 	return c.html("<h1>Bye World 🌎</h1>");
 });
 
 app.post("/join/ambassador", async (c) => {
+	const { DB_URL, AUTHTOKEN } = env<{ DB_URL: string; AUTHTOKEN: string }>(c);
+
+	const client = createClient({
+		url: DB_URL,
+		authToken: AUTHTOKEN,
+	});
+
 	const body = await c.req.json();
 	const ambassador: Ambassador = {
 		id: uuidv4() as string,
