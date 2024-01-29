@@ -1,9 +1,9 @@
 # Messiah
 
 ### TODO
-[ ] CI/CD setup
-[ ] user registration
-[ ] turso integration
+- [ ] CI/CD setup
+- [ ] user registration
+- [ ] turso integration
 
 ```
 npm install
