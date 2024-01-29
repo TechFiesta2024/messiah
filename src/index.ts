@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import { workshops } from "./types/workshops";
 import { events } from "./types/events";
+import { workshops } from "./types/workshops";
 
 const app = new Hono();
 
