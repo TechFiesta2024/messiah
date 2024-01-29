@@ -1,6 +1,7 @@
 # Messiah
 
 ### TODO
+- [ ] zod validation
 - [ ] CI/CD setup
 - [ ] user registration
 - [ ] turso integration

@@ -1,4 +1,4 @@
-export interface Users {
+export interface User {
 	id: string; // user id, uuid
 	name: string; // name
 	email: string; // email
@@ -7,4 +7,10 @@ export interface Users {
 	contact: string; // contact number
 	workshops: [number]; // corresponding workshop id
 	events: [number]; // corresponding event id
+	team: [string]; // team id
+}
+
+export interface Team {
+	user_id: [string]; // user id, uuid
+	event_id: [number]; // corresponding event id
 }
