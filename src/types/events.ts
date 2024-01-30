@@ -4,8 +4,8 @@ export interface Event {
 	body: string; // brief description of the event
 	timeing: string; // time of the event
 	venue: string; // venue of the event
-	coordinator: [string]; // coordinators
-	contact_coordinator: [string]; // contact of coordinators
+	coordinator: string[]; // coordinators
+	contact_coordinator: string[]; // contact of coordinators
 }
 
 export const events: Event[] = [

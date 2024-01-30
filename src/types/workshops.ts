@@ -11,8 +11,8 @@ export interface Workshop {
 	venu: location; // online or offline
 	link: string; // meeting link for online workshop
 	dest: string; // destination for offline workshop
-	coordinator: [string]; // coordinators
-	contact_coordinator: [string]; // contact of coordinators
+	coordinator: string[]; // coordinators
+	contact_coordinator: string[]; // contact of coordinators
 }
 
 export const workshops: Workshop[] = [
