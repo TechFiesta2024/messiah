@@ -5,11 +5,14 @@
     "check": "biome check . --apply"
   },
   "dependencies": {
-    "hono": "^3.12.7"
+    "@libsql/client": "^0.4.2",
+    "hono": "^3.12.7",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@biomejs/biome": "1.5.3",
     "@cloudflare/workers-types": "^4.20231218.0",
+    "@types/uuid": "^9.0.8",
     "wrangler": "^3.22.0"
   }
 }
