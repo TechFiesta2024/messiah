@@ -5,5 +5,5 @@ export interface Community {
 	college_name: string; // college name
 	contact: string; // contact number
 	no_of_regs: number; // number of responses
-	socials: [string]; // social links
+	socials: string[]; // social links
 }
