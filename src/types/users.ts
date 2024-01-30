@@ -5,12 +5,12 @@ export interface User {
 	college_name: string; // college name
 	semester: number; // semester
 	contact: string; // contact number
-	workshops: [number]; // corresponding workshop id
-	events: [number]; // corresponding event id
-	team: [string]; // team id
+	workshops: number[]; // corresponding workshop id
+	events: number[]; // corresponding event id
+	team: string[]; // team id
 }
 
 export interface Team {
-	user_id: [string]; // user id, uuid
-	event_id: [number]; // corresponding event id
+	user_id: string[]; // user id, uuid
+	event_id: number[]; // corresponding event id
 }
