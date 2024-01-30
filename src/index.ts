@@ -1,7 +1,7 @@
 import { createClient } from "@libsql/client/web";
 import { Hono } from "hono";
-import { cors } from "hono/cors";
 import { env } from "hono/adapter";
+import { cors } from "hono/cors";
 import { v4 as uuidv4 } from "uuid";
 import { Ambassador } from "./types/ambassador";
 import { events } from "./types/events";
