@@ -4,7 +4,6 @@ export interface Ambassador {
 	email: string; // email
 	college: string; // college name
 	contact: string; // contact number
-	github: string; // github link
 	linkedin: string; // linkedin link
 	twitter: string; // twitter link
 	created_at: string; // created at
