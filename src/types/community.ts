@@ -1,9 +1,11 @@
-export interface community {
-	id: string; // user id, uuid
-	name: string; // name
-	email: string; // email
-	college: string; // college name
-	contact: string; // contact number
-	no_of_regs: number; // number of responses
-	socials: string[]; // social links
-}
+import { z } from "zod";
+
+export const CommunitySchema = z.object({
+	id: z.string(),
+	created_at: z.string(),
+	name: z.string(),
+	email: z.string().email(),
+	college: z.string(),
+	contact: z.string().min(10).max(10),
+	socials: z.array(z.string().url()),
+});
