@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { env } from "hono/adapter";
 import { cors } from "hono/cors";
 import { AmbassadorSchema } from "./types/ambassador";
+import { CommunitySchema } from "./types/community";
 import { events } from "./types/events";
 import { workshops } from "./types/workshops";
 import { generateRandomString } from "./utils/gen-random";
@@ -33,7 +34,6 @@ app.post("/join/ambassador", async (c) => {
 		...body,
 		id: crypto.randomUUID(),
 		created_at: new Date().toISOString(),
-		no_of_regs: 0,
 		referral_code: generateRandomString(8),
 	});
 
@@ -43,7 +43,7 @@ app.post("/join/ambassador", async (c) => {
 
 	// TODO error handling
 	const result = await client.execute({
-		sql: "insert into ambassadors values (:id, :email, :created_at, :college, :contact, :name, :linkedin, :twitter, :description, :no_of_regs, :referral_code)",
+		sql: "insert into ambassadors values (:id, :email, :created_at, :college, :contact, :name, :linkedin, :twitter, :description, :referral_code)",
 		args: { ...ambassador.data },
 	});
 
@@ -62,6 +62,55 @@ app.post("/join/ambassador", async (c) => {
 	console.log(res.status);
 
 	return c.json("successfully added", 200);
+});
+
+app.post("/join/community", async (c) => {
+	const { DB_URL, AUTHTOKEN, BREVOKEY } = env<{
+		DB_URL: string;
+		AUTHTOKEN: string;
+		BREVOKEY: string;
+	}>(c);
+
+	const client = createClient({
+		url: DB_URL,
+		authToken: AUTHTOKEN,
+	});
+
+	const body = await c.req.json();
+
+	const community = CommunitySchema.safeParse({
+		...body,
+		id: crypto.randomUUID(),
+		created_at: new Date().toISOString(),
+	});
+
+	if (!community.success) {
+		return c.json(community.error, 400);
+	}
+
+	const result = await client.execute({
+		sql: "insert into community values (:id, :email, :created_at, :college, :contact, :socials, :name)",
+		args: {
+			...community.data,
+			socials: JSON.stringify(community.data.socials),
+		},
+	});
+
+	console.log(result.toJSON());
+
+	const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			"api-key": BREVOKEY,
+			accept: "application/json",
+		},
+		body: `{"sender":{"name":"TechFiesta Tech Team","email":"devlemon@mail.com"},"to":[{"email":"${community.data.email}","name":"${community.data.name}"}],"subject":"Welcome to TechFiesta 2024","htmlContent":"<html><head></head><body><p>Hello,</p>Thank you for joining our community collab.</p></body></html>"}`,
+	});
+
+	console.log(res.status);
+
+	return c.json(community.data, 200);
 });
 
 app.get("/workshops", (c) => {
