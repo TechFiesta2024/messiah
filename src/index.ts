@@ -2,22 +2,13 @@ import { LibsqlError, createClient } from "@libsql/client/web";
 import { Hono } from "hono";
 import { env } from "hono/adapter";
 import { cors } from "hono/cors";
-import { logger } from "hono/logger";
 import { AmbassadorSchema } from "./types/ambassador";
 import { CommunitySchema } from "./types/community";
-import { events } from "./types/events";
-import { workshops } from "./types/workshops";
 import { generateRandomString } from "./utils/gen-random";
 
 const app = new Hono();
 
-app.use("*", logger());
-
 app.use("/join/*", cors({ origin: "*" }));
-
-app.get("/", (c) => {
-	return c.html("<h1>Bye World 🌎</h1>");
-});
 
 app.post("/join/ambassador", async (c) => {
 	const { DB_URL, AUTHTOKEN, BREVOKEY } = env<{
@@ -25,6 +16,8 @@ app.post("/join/ambassador", async (c) => {
 		AUTHTOKEN: string;
 		BREVOKEY: string;
 	}>(c);
+
+	console.log(c);
 
 	const client = createClient({
 		url: DB_URL,
@@ -41,6 +34,7 @@ app.post("/join/ambassador", async (c) => {
 	});
 
 	if (!ambassador.success) {
+		// logger.error("error in ambassador schema", ambassador.error);
 		return c.json(ambassador.error, 400);
 	}
 
@@ -131,24 +125,6 @@ app.post("/join/community", async (c) => {
 	}
 
 	return c.json(community.data, 200);
-});
-
-app.get("/workshops", (c) => {
-	return c.json(workshops);
-});
-
-app.get("/workshops/:id", (c) => {
-	const id = c.req.param("id");
-	return c.json(workshops.find((w) => w.id === Number(id)));
-});
-
-app.get("/events", (c) => {
-	return c.json(events);
-});
-
-app.get("/events/:id", (c) => {
-	const id = c.req.param("id");
-	return c.json(events.find((e) => e.id === Number(id)));
 });
 
 export default app;
