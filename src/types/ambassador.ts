@@ -10,6 +10,5 @@ export const AmbassadorSchema = z.object({
 	twitter: z.string().url(),
 	created_at: z.string(),
 	description: z.string(),
-	no_of_regs: z.number(),
 	referral_code: z.string(),
 });
