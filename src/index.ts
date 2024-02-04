@@ -1,8 +1,8 @@
-import { createClient, LibsqlError } from "@libsql/client/web";
+import { LibsqlError, createClient } from "@libsql/client/web";
 import { Hono } from "hono";
 import { env } from "hono/adapter";
-import { logger } from "hono/logger";
 import { cors } from "hono/cors";
+import { logger } from "hono/logger";
 import { AmbassadorSchema } from "./types/ambassador";
 import { CommunitySchema } from "./types/community";
 import { events } from "./types/events";
