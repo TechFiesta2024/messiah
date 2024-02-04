@@ -39,3 +39,21 @@ export const workshops: Workshop[] = [
 		contact_coordinator: ["1234567890"],
 	},
 ];
+
+// app.get("/workshops", (c) => {
+// 	return c.json(workshops);
+// });
+//
+// app.get("/workshops/:id", (c) => {
+// 	const id = c.req.param("id");
+// 	return c.json(workshops.find((w) => w.id === Number(id)));
+// });
+//
+// app.get("/events", (c) => {
+// 	return c.json(events);
+// });
+//
+// app.get("/events/:id", (c) => {
+// 	const id = c.req.param("id");
+// 	return c.json(events.find((e) => e.id === Number(id)));
+// });
