@@ -1,18 +1,15 @@
 {
+  "name": "messiah",
+  "version": "1.0.50",
   "scripts": {
-    "dev": "wrangler dev src/index.ts",
-    "deploy": "wrangler deploy --minify src/index.ts",
-    "check": "biome check . --apply"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
-    "@libsql/client": "^0.4.2",
-    "hono": "^3.12.7",
-    "zod": "^3.22.4"
+    "elysia": "latest"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.5.3",
-    "@cloudflare/workers-types": "^4.20231218.0",
-    "@types/uuid": "^9.0.8",
-    "wrangler": "^3.22.0"
-  }
+    "bun-types": "latest"
+  },
+  "module": "src/index.js"
 }
