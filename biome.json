@@ -8,5 +8,12 @@
 		"rules": {
 			"recommended": true
 		}
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"lineWidth": 80,
+		"lineEnding": "lf",
+		"indentWidth": 2
 	}
 }

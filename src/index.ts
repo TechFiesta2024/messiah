@@ -1,7 +1,21 @@
+import { logger } from "@bogeychan/elysia-logger";
 import { Elysia } from "elysia";
 
-const app = new Elysia().get("/", () => "Hello Elysia").listen(3000);
+const hello = () => {
+	return "Hello lemon";
+};
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+const log = logger({
+	autoLogging: true,
+	transport: {
+		target: "pino-pretty",
+		options: {
+			colorize: true,
+		},
+	},
+});
+
+new Elysia()
+	.use(log)
+	.get("/", hello)
+	.listen(process.env.PORT || 3000);
