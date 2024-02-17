@@ -17,7 +17,9 @@ export default function handleError<TCallback extends Callback>(
 		if (result instanceof Promise) {
 			return result
 				.then((rx) => [null, rx])
-				.catch((error) => [error, null]) as MaybeAsyncResult<ReturnType<TCallback>>;
+				.catch((error) => [error, null]) as MaybeAsyncResult<
+				ReturnType<TCallback>
+			>;
 		}
 
 		return [null, result] as MaybeAsyncResult<ReturnType<TCallback>>;

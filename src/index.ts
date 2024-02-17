@@ -1,8 +1,12 @@
 import { logger } from "@bogeychan/elysia-logger";
 import { Elysia } from "elysia";
 
-const hello = () => {
-	return "Hello lemon";
+import { pool } from "./db";
+
+const hello = async () => {
+	const ans = await pool.query("SELECT NOW()");
+
+	return ans.rows[0];
 };
 
 const log = logger({

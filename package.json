@@ -9,10 +9,12 @@
   "dependencies": {
     "@bogeychan/elysia-logger": "^0.0.17",
     "elysia": "latest",
+    "pg": "^8.11.3",
     "pino-pretty": "^10.3.1"
   },
   "devDependencies": {
     "@biomejs/biome": "1.5.3",
+    "@types/pg": "^8.11.0",
     "bun-types": "latest"
   },
   "module": "src/index.js"
