@@ -1,7 +1,7 @@
 import { Elysia, t } from "elysia";
 
-import { log } from "../log";
 import { pool } from "../db";
+import { log } from "../log";
 
 export const community = (app: Elysia) =>
 	app.group("/community", (app) =>
@@ -16,7 +16,11 @@ export const community = (app: Elysia) =>
 				"/ambassador",
 				async (ctx) => {
 					ctx.log.info(ctx.body);
-					return ctx.body;
+					const res = await ctx.dbpool.query(
+						"INSERT INTO ambassador (name, email, college, contact, linkedin, twitter, description) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+						[...Object.values(ctx.body)],
+					);
+					return res.rows[0];
 				},
 				{
 					body: t.Object({
@@ -40,7 +44,12 @@ export const community = (app: Elysia) =>
 			.post(
 				"/collab",
 				async (ctx) => {
-					return ctx.body;
+					ctx.log.info(ctx.body);
+					const res = await ctx.dbpool.query(
+						"INSERT INTO community (name, email, college, contact) VALUES ($1, $2, $3, $4) RETURNING *",
+						[...Object.values(ctx.body)],
+					);
+					return res.rows[0];
 				},
 				{
 					body: t.Object({
