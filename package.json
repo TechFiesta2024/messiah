@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "@bogeychan/elysia-logger": "^0.0.17",
+    "@elysiajs/cookie": "^0.8.0",
+    "@elysiajs/server-timing": "^0.8.0",
     "elysia": "latest",
     "pg": "^8.11.3",
     "pino-pretty": "^10.3.1"

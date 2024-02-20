@@ -7,7 +7,7 @@ type MaybeAsyncResult<R> = R extends Promise<infer U>
 	? Promise<Result<U>>
 	: Result<R>;
 
-export default function handleError<TCallback extends Callback>(
+export function handleError<TCallback extends Callback>(
 	cb: TCallback,
 	...args: Parameters<TCallback>
 ): MaybeAsyncResult<ReturnType<TCallback>> {
