@@ -1,5 +1,5 @@
-import { Elysia, t } from "elysia";
 import { cookie } from "@elysiajs/cookie";
+import { Elysia, t } from "elysia";
 
 import { pool } from "../db";
 import { log } from "../log";
