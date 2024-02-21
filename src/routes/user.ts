@@ -22,10 +22,12 @@ export const user = (app: Elysia) =>
 				"/login",
 				async (ctx) => {
 					ctx.log.info(ctx.body);
+
 					const res = await ctx.dbpool.query(
 						"INSERT INTO users (name, email, college, contact, stream, year) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
 						[...Object.values(ctx.body)],
 					);
+
 					ctx.setCookie("user", res.rows[0].id);
 					return res.rows[0];
 				},
@@ -51,8 +53,8 @@ export const user = (app: Elysia) =>
 					}),
 				},
 			)
-			.post("/logout", (ctx) => {
-				ctx.removeCookie("user");
+			.post("/logout", ({ cookie: { user } }) => {
+				user.remove;
 				return "adios senor";
 			}),
 	);
