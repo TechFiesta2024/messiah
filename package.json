@@ -2,7 +2,8 @@
   "name": "messiah",
   "version": "1.0.50",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:generate": "drizzle-kit generate:pg --schema ./src/db/schema.ts --out=./migrations",
+    "db:migrate": "bun run ./src/db/migrate.ts",
     "dev": "bun run --watch src/index.ts",
     "format": "biome check . --apply"
   },
@@ -10,6 +11,7 @@
     "@bogeychan/elysia-logger": "^0.0.17",
     "@elysiajs/cookie": "^0.8.0",
     "@elysiajs/server-timing": "^0.8.0",
+    "drizzle-orm": "^0.29.3",
     "elysia": "latest",
     "pg": "^8.11.3",
     "pino-pretty": "^10.3.1"
@@ -17,7 +19,8 @@
   "devDependencies": {
     "@biomejs/biome": "1.5.3",
     "@types/pg": "^8.11.0",
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "drizzle-kit": "^0.20.14"
   },
   "module": "src/index.js"
 }

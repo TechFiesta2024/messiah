@@ -1,7 +1,9 @@
+import { randomUUID } from "node:crypto";
 import { cookie } from "@elysiajs/cookie";
 import { Elysia, t } from "elysia";
 
-import { pool } from "../db";
+import { db } from "../db";
+import { users } from "../db/schema";
 import { log } from "../log";
 
 export const user = (app: Elysia) =>
@@ -13,23 +15,27 @@ export const user = (app: Elysia) =>
 					httpOnly: true,
 				}),
 			)
-			.decorate("dbpool", pool)
 			.onError((ctx) => {
 				ctx.log.error(ctx, ctx.error.message);
 				return ctx.error.message;
 			})
 			.post(
 				"/login",
-				async (ctx) => {
-					ctx.log.info(ctx.body);
+				async ({ log, body, setCookie }) => {
+					log.info(body);
 
-					const res = await ctx.dbpool.query(
-						"INSERT INTO users (name, email, college, contact, stream, year) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-						[...Object.values(ctx.body)],
-					);
+					const res = await db
+						.insert(users)
+						.values({
+							id: randomUUID(),
+							...body,
+							workshops: [],
+						})
+						.returning({ id: users.id });
 
-					ctx.setCookie("user", res.rows[0].id);
-					return res.rows[0];
+					setCookie("user", res[0].id);
+
+					return res[0].id;
 				},
 				{
 					body: t.Object({
@@ -45,11 +51,7 @@ export const user = (app: Elysia) =>
 							error: "invalid contact number",
 						}),
 						stream: t.String(),
-						year: t.Number({
-							maximum: 4,
-							minimum: 1,
-							error: "invalid year",
-						}),
+						year: t.String(),
 					}),
 				},
 			)
