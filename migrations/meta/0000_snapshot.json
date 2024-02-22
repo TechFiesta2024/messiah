@@ -1,5 +1,5 @@
 {
-  "id": "7ed5d40d-1dc1-47d4-94d9-bc196cda5737",
+  "id": "7c1b3f09-f379-4d10-9a84-998d2ba869fb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -195,13 +195,6 @@
           "nullsNotDistinct": false,
           "columns": [
             "email"
-          ]
-        },
-        "users_workshops_unique": {
-          "name": "users_workshops_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "workshops"
           ]
         }
       }
