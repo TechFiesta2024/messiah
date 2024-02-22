@@ -1,27 +1,30 @@
+import { randomUUID } from "node:crypto";
 import { Elysia, t } from "elysia";
 
-import { pool } from "../db";
-import { handleError } from "../error";
+import { db } from "../db";
+import { ambassadors, communities } from "../db/schema";
 import { log } from "../log";
 
 export const community = (app: Elysia) =>
 	app.group("/community", (app) =>
 		app
 			.use(log)
-			.decorate("dbpool", pool)
 			.onError((ctx) => {
 				ctx.log.error(ctx, ctx.error.message);
 				return ctx.error.message;
 			})
 			.post(
 				"/ambassador",
-				async (ctx) => {
-					ctx.log.info(`received request: ${ctx.body}`);
-					const res = await ctx.dbpool.query(
-						"INSERT INTO ambassador (name, email, college, contact, linkedin, twitter, description) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
-						[...Object.values(ctx.body)],
-					);
-					return res.rows[0];
+				async ({ body, log }) => {
+					log.info(`received request: ${body}`);
+					const res = await db
+						.insert(ambassadors)
+						.values({
+							id: randomUUID(),
+							...body,
+						})
+						.returning();
+					return res;
 				},
 				{
 					body: t.Object({
@@ -44,16 +47,14 @@ export const community = (app: Elysia) =>
 			)
 			.post(
 				"/collab",
-				async (ctx) => {
-					ctx.log.info("/community/collab");
-					ctx.log.info(ctx.body);
-					const res = await ctx.dbpool.query(
-						"INSERT INTO community (name, email, college, contact) VALUES ($1, $2, $3, $4) RETURNING *",
-						[...Object.values(ctx.body)],
-					);
-					ctx.log.info(res.rows[0]);
-					ctx.log.info("successfull insert into community table");
-					return res.rows[0];
+				async ({ log, body }) => {
+					log.info("/community/collab");
+					log.info(body);
+					const res = await db.insert(communities).values({
+						id: randomUUID(),
+						...body,
+					});
+					return res;
 				},
 				{
 					body: t.Object({
