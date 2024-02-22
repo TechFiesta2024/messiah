@@ -5,10 +5,10 @@ import { eq } from "drizzle-orm";
 import { db } from "../db";
 import {
 	users,
-	workshopProduct,
-	workshopHardware,
 	workshopCAD,
 	workshopCTF,
+	workshopHardware,
+	workshopProduct,
 } from "../db/schema";
 import { log } from "../log";
 
