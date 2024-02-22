@@ -5,7 +5,7 @@
     "db:generate": "drizzle-kit generate:pg --schema ./src/db/schema.ts --out=./migrations",
     "db:migrate": "bun run ./src/db/migrate.ts",
     "dev": "bun run --watch src/index.ts",
-    "format": "biome check . --apply"
+    "format": "biome check src --apply"
   },
   "dependencies": {
     "@bogeychan/elysia-logger": "^0.0.17",
