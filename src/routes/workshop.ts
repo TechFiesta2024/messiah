@@ -3,25 +3,46 @@ import { Elysia, t } from "elysia";
 
 import { eq } from "drizzle-orm";
 import { db } from "../db";
-import { users } from "../db/schema";
+import {
+	users,
+	workshopCAD,
+	workshopCTF,
+	workshopHardware,
+	workshopProduct,
+} from "../db/schema";
 import { log } from "../log";
 
 const updateWorkshop = async (userId: string, workshop: string) => {
 	const userInfo = await db.select().from(users).where(eq(users.id, userId));
 
-	userInfo[0].workshops.push(workshop);
-	const updatedUser = await db
-		.update(users)
-		.set({
-			workshops: userInfo[0].workshops,
-		})
-		.where(eq(users.id, userInfo[0].id))
-		.returning({
-			name: users.name,
-			email: users.email,
-		});
+	if (["product_design", "hardware", "cad", "ctf"].includes(workshop)) {
+		userInfo[0].workshops.push(workshop);
 
-	return updatedUser[0];
+		switch (workshop) {
+			case "product_design":
+				await db.insert(workshopProduct).values({ ...userInfo[0] });
+				break;
+			case "hardware":
+				await db.insert(workshopHardware).values({ ...userInfo[0] });
+				break;
+			case "cad":
+				await db.insert(workshopCAD).values({ ...userInfo[0] });
+				break;
+			case "ctf":
+				await db.insert(workshopCTF).values({ ...userInfo[0] });
+				break;
+			default:
+				throw new Error("Workshop not found");
+		}
+
+		const updatedUser = await db
+			.update(users)
+			.set({ workshops: userInfo[0].workshops })
+			.where(eq(users.id, userId))
+			.returning({ name: users.name, email: users.email });
+
+		return updatedUser[0];
+	}
 };
 
 export const workshop = (app: Elysia) =>
@@ -40,18 +61,14 @@ export const workshop = (app: Elysia) =>
 			.post(
 				"/join/:id",
 				async ({ log, cookie: { user }, params: { id } }) => {
-					try {
-						if (!user) {
-							throw new Error("user not logged in");
-						}
+					if (!user) {
+						throw new Error("user not logged in");
+					}
 
-						if (id === "product_design") {
-							const updatedUser = await updateWorkshop(user, id);
-							return `Congratulations ${updatedUser.name}, you have successfully joined the Product Development Workshop!`;
-						}
-					} catch (error) {
-						log.error(error);
-						return "oops";
+					const updatedUser = await updateWorkshop(user, id);
+
+					if (updatedUser) {
+						return `Congratulations ${updatedUser.name}, you have successfully joined the ${id}!`;
 					}
 				},
 				{
