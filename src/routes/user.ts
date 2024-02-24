@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { cookie } from "@elysiajs/cookie";
+import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 
 import { db } from "../db";
@@ -23,6 +24,17 @@ export const user = (app: Elysia) =>
 				"/login",
 				async ({ log, body, setCookie }) => {
 					log.info(body);
+
+					const userExists = await db
+						.select()
+						.from(users)
+						.where(eq(users.email, body.email));
+
+					if (userExists) {
+						setCookie("user", userExists[0].id);
+
+						return `User already exists ${userExists[0].email}`;
+					}
 
 					const res = await db
 						.insert(users)
@@ -58,5 +70,11 @@ export const user = (app: Elysia) =>
 			.post("/logout", ({ cookie: { user } }) => {
 				user.remove;
 				return "adios senor";
+			})
+			.get("/me", async ({ cookie: { user } }) => {
+				if (!user) {
+					throw new Error("user not logged in");
+				}
+				return await db.select().from(users).where(eq(users.id, user));
 			}),
 	);

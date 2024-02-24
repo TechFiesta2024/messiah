@@ -28,20 +28,21 @@ export const community = (app: Elysia) =>
 				},
 				{
 					body: t.Object({
-						name: t.String(),
-						email: t.String({
+						ambassador_name: t.String(),
+						ambassador_email: t.String({
 							format: "email",
 							errror: "invalid email",
 						}),
-						college: t.String(),
-						contact: t.String({
+						ambassador_college: t.String(),
+						ambassador_contact: t.String({
 							maxLength: 10,
 							minLength: 10,
 							error: "invalid contact number",
 						}),
-						linkedin: t.String(),
-						twitter: t.String(),
-						description: t.String(),
+						ambassador_linkedin: t.String(),
+						ambassador_description: t.String({
+							maxLength: 200,
+						}),
 					}),
 				},
 			)
@@ -50,21 +51,23 @@ export const community = (app: Elysia) =>
 				async ({ log, body }) => {
 					log.info("/community/collab");
 					log.info(body);
-					const res = await db.insert(communities).values({
+					await db.insert(communities).values({
 						id: randomUUID(),
 						...body,
 					});
-					return res;
+					return "success";
 				},
 				{
 					body: t.Object({
-						name: t.String(),
-						email: t.String({
+						community_name: t.String(),
+						community_email: t.String({
 							format: "email",
 							errror: "invalid email",
 						}),
-						college: t.String(),
-						contact: t.String({
+						community_college: t.String(),
+						community_lead_name: t.String(),
+						community_linkedin: t.String(),
+						community_contact: t.String({
 							maxLength: 10,
 							minLength: 10,
 							error: "invalid contact number",

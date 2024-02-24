@@ -1,5 +1,5 @@
 {
-  "id": "7ed5d40d-1dc1-47d4-94d9-bc196cda5737",
+  "id": "fb007f05-2616-4e3b-bb0d-858c2b5b49c7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -55,13 +55,7 @@
           "name": "linkedin",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
-        },
-        "twitter": {
-          "name": "twitter",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
@@ -114,6 +108,18 @@
         },
         "contact": {
           "name": "contact",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lead_name": {
+          "name": "lead_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "linkedin": {
+          "name": "linkedin",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -195,13 +201,6 @@
           "nullsNotDistinct": false,
           "columns": [
             "email"
-          ]
-        },
-        "users_workshops_unique": {
-          "name": "users_workshops_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "workshops"
           ]
         }
       }
