@@ -6,8 +6,7 @@ CREATE TABLE IF NOT EXISTS "ambassadors" (
 	"college" text NOT NULL,
 	"contact" text NOT NULL,
 	"description" text NOT NULL,
-	"linkedin" text,
-	"twitter" text,
+	"linkedin" text NOT NULL,
 	CONSTRAINT "ambassadors_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
@@ -18,6 +17,8 @@ CREATE TABLE IF NOT EXISTS "communities" (
 	"email" text NOT NULL,
 	"college" text NOT NULL,
 	"contact" text NOT NULL,
+	"lead_name" text NOT NULL,
+	"linkedin" text NOT NULL,
 	CONSTRAINT "communities_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
