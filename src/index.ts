@@ -13,5 +13,9 @@ new Elysia()
 	.use(user)
 	.use(health_check)
 	.use(serverTiming())
-	.use(swagger())
+	.use(
+		swagger({
+			path: "/docs",
+		}),
+	)
 	.listen(process.env.PORT || 3000);
