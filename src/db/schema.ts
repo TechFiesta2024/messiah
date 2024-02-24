@@ -9,7 +9,7 @@ BEGIN
     FROM unnest(NEW.workshops) element
   ) <> cardinality(NEW.workshops)
   THEN
-RAISE EXCEPTION 'you have already joined this workshop'
+RAISE EXCEPTION 'you have already joined this workshop';
   END IF;
   RETURN NEW;
 END;

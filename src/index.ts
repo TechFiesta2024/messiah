@@ -1,4 +1,5 @@
 import { serverTiming } from "@elysiajs/server-timing";
+import { swagger } from "@elysiajs/swagger";
 import { Elysia } from "elysia";
 
 import { community } from "./routes/community";
@@ -12,4 +13,5 @@ new Elysia()
 	.use(user)
 	.use(health_check)
 	.use(serverTiming())
+	.use(swagger())
 	.listen(process.env.PORT || 3000);
