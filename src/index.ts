@@ -1,4 +1,5 @@
 import { swagger } from "@elysiajs/swagger";
+import { cors } from "@elysiajs/cors";
 import { Elysia } from "elysia";
 
 import { community } from "./routes/community";
@@ -18,6 +19,7 @@ new Elysia()
 			},
 		}),
 	)
+	.use(cors())
 	.use(community)
 	.use(workshop)
 	.use(user)
