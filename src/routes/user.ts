@@ -33,7 +33,7 @@ export const user = (app: Elysia) =>
 						.from(users)
 						.where(eq(users.email, body.email));
 
-					if (userExists) {
+					if (userExists && userExists.length > 0) {
 						setCookie("user", userExists[0].id);
 
 						return {

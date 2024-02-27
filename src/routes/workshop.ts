@@ -15,6 +15,10 @@ import { log } from "../log";
 const updateWorkshop = async (userId: string, workshop: string) => {
 	const userInfo = await db.select().from(users).where(eq(users.id, userId));
 
+	if (userInfo.length !== 1) {
+		throw new Error("User not found");
+	}
+
 	if (["product_design", "hardware", "cad", "ctf"].includes(workshop)) {
 		userInfo[0].workshops.push(workshop);
 
@@ -31,11 +35,8 @@ const updateWorkshop = async (userId: string, workshop: string) => {
 			case "ctf":
 				await db.insert(workshopCTF).values({ ...userInfo[0] });
 				break;
-			default:
-				throw new Error("Workshop not found");
 		}
 
-		// TODO: cookie hacking throw an error if the user is not found
 		const updatedUser = await db
 			.update(users)
 			.set({ workshops: userInfo[0].workshops })
@@ -44,6 +45,8 @@ const updateWorkshop = async (userId: string, workshop: string) => {
 
 		return updatedUser[0];
 	}
+
+	throw new Error("Workshop not found");
 };
 
 export const workshop = (app: Elysia) =>
@@ -70,12 +73,19 @@ export const workshop = (app: Elysia) =>
 					}
 					log.info({ user, id });
 
-					const updatedUser = await updateWorkshop(user, id);
+					try {
+						const updatedUser = await updateWorkshop(user, id);
 
-					if (updatedUser) {
-						return {
-							message: `Congratulations ${updatedUser.name}, you have successfully joined the ${id}!`,
-						};
+						if (updatedUser) {
+							return {
+								message: `Congratulations ${updatedUser.name}, you have successfully joined the ${id}!`,
+							};
+						}
+					} catch (error) {
+						set.status = 400;
+						if (error instanceof Error) {
+							throw new Error(error.message);
+						}
 					}
 				},
 				{
@@ -88,6 +98,10 @@ export const workshop = (app: Elysia) =>
 							"Join a workshop by providing the workshop id",
 						responses: {
 							200: { description: "Success" },
+							400: {
+								description:
+									"Invalid workshop | User tampered with the cookie",
+							},
 							401: { description: "User not logged in" },
 							500: { description: "Internal server error" },
 						},
