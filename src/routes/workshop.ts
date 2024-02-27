@@ -35,6 +35,7 @@ const updateWorkshop = async (userId: string, workshop: string) => {
 				throw new Error("Workshop not found");
 		}
 
+		// TODO: cookie hacking throw an error if the user is not found
 		const updatedUser = await db
 			.update(users)
 			.set({ workshops: userInfo[0].workshops })
@@ -55,26 +56,43 @@ export const workshop = (app: Elysia) =>
 				}),
 			)
 			.onError((ctx) => {
-				ctx.log.error(ctx, ctx.error.message);
-				return ctx.error.message;
+				ctx.log.error(ctx.error.message);
+				return {
+					message: ctx.error.message,
+				};
 			})
 			.post(
 				"/join/:id",
-				async ({ log, cookie: { user }, params: { id } }) => {
+				async ({ set, log, cookie: { user }, params: { id } }) => {
 					if (!user) {
+						set.status = 401;
 						throw new Error("user not logged in");
 					}
+					log.info({ user, id });
 
 					const updatedUser = await updateWorkshop(user, id);
 
 					if (updatedUser) {
-						return `Congratulations ${updatedUser.name}, you have successfully joined the ${id}!`;
+						return {
+							message: `Congratulations ${updatedUser.name}, you have successfully joined the ${id}!`,
+						};
 					}
 				},
 				{
 					params: t.Object({
 						id: t.String({}),
 					}),
+					detail: {
+						summary: "Join a workshop",
+						description:
+							"Join a workshop by providing the workshop id",
+						responses: {
+							200: { description: "Success" },
+							401: { description: "User not logged in" },
+							500: { description: "Internal server error" },
+						},
+						tags: ["workshop"],
+					},
 				},
 			),
 	);
