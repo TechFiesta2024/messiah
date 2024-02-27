@@ -1,12 +1,15 @@
+import { cors } from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
 import { Elysia } from "elysia";
 
+import { log } from "./log";
 import { community } from "./routes/community";
 import { health_check } from "./routes/health_check";
 import { user } from "./routes/user";
 import { workshop } from "./routes/workshop";
 
 new Elysia()
+	.use(log)
 	.use(
 		swagger({
 			path: "/docs",
@@ -18,6 +21,7 @@ new Elysia()
 			},
 		}),
 	)
+	.use(cors())
 	.use(community)
 	.use(workshop)
 	.use(user)

@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { Elysia, t } from "elysia";
 
+import { DatabaseError } from "pg";
 import { db } from "../db";
 import { ambassadors, communities } from "../db/schema";
 import { log } from "../log";
@@ -10,21 +11,36 @@ export const community = (app: Elysia) =>
 		app
 			.use(log)
 			.onError((ctx) => {
-				ctx.log.error(ctx, ctx.error.message);
-				return ctx.error.message;
+				ctx.log.error(ctx.error.message);
+
+				return {
+					message: ctx.error.message,
+				};
 			})
 			.post(
 				"/ambassador",
-				async ({ body, log }) => {
-					log.info(`received request: ${body}`);
-					const res = await db
-						.insert(ambassadors)
-						.values({
+				async ({ set, body, log }) => {
+					log.info(body);
+
+					try {
+						await db.insert(ambassadors).values({
 							id: randomUUID(),
 							...body,
-						})
-						.returning();
-					return res;
+						});
+					} catch (error) {
+						if (
+							error instanceof DatabaseError &&
+							error.code === "23505"
+						) {
+							set.status = 409;
+							throw new Error("ambassador already exists");
+						}
+					}
+
+					return {
+						message:
+							"well done! you have successfully registered as an ambassador!",
+					};
 				},
 				{
 					body: t.Object({
@@ -44,18 +60,43 @@ export const community = (app: Elysia) =>
 							maxLength: 200,
 						}),
 					}),
+					detail: {
+						summary: "Register as an ambassador",
+						discription:
+							"Register as an ambassador by providing the required details",
+						responses: {
+							200: { description: "Success" },
+							409: { description: "Already exists" },
+							500: { description: "Internal server error" },
+						},
+						tags: ["ambassador"],
+					},
 				},
 			)
 			.post(
 				"/collab",
-				async ({ log, body }) => {
-					log.info("/community/collab");
+				async ({ set, log, body }) => {
 					log.info(body);
-					await db.insert(communities).values({
-						id: randomUUID(),
-						...body,
-					});
-					return "success";
+
+					try {
+						await db.insert(communities).values({
+							id: randomUUID(),
+							...body,
+						});
+					} catch (error) {
+						if (
+							error instanceof DatabaseError &&
+							error.code === "23505"
+						) {
+							set.status = 409;
+							throw new Error("community already exists");
+						}
+					}
+
+					return {
+						message:
+							"well done! you have successfully registered as a community!",
+					};
 				},
 				{
 					body: t.Object({
@@ -73,6 +114,17 @@ export const community = (app: Elysia) =>
 							error: "invalid contact number",
 						}),
 					}),
+					detail: {
+						summary: "Register as a community collaborator",
+						description:
+							"Register as a community collaborator by providing the required details",
+						responses: {
+							200: { description: "Success" },
+							409: { description: "Already exists" },
+							500: { description: "Internal server error" },
+						},
+						tags: ["community"],
+					},
 				},
 			),
 	);
