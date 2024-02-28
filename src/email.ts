@@ -3,7 +3,7 @@ export const sendEmail = async (
 	toEmail: string,
 	subject: string,
 	body: string,
-) => {
+): Promise<string | Error> => {
 	const hermesUrl = process.env.HERMES_URL;
 	const hermesApiKey = process.env.HERMES_API_KEY;
 	const email = process.env.EMAIL;

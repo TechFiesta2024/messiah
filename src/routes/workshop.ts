@@ -1,7 +1,7 @@
 import { cookie } from "@elysiajs/cookie";
+import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 
-import { eq } from "drizzle-orm";
 import { db } from "../db";
 import {
 	users,
@@ -10,6 +10,7 @@ import {
 	workshopHardware,
 	workshopProduct,
 } from "../db/schema";
+import { sendEmail } from "../email";
 import { log } from "../log";
 
 const updateWorkshop = async (userId: string, workshop: string) => {
@@ -76,11 +77,16 @@ export const workshop = (app: Elysia) =>
 					try {
 						const updatedUser = await updateWorkshop(user, id);
 
-						if (updatedUser) {
-							return {
-								message: `Congratulations ${updatedUser.name}, you have successfully joined the ${id}!`,
-							};
-						}
+						await sendEmail(
+							updatedUser.name,
+							updatedUser.email,
+							"Workshop Joined",
+							`Congratulations ${updatedUser.name}, you have successfully joined the ${id}!`,
+						);
+
+						return {
+							message: `Congratulations ${updatedUser.name}, you have successfully joined the ${id}!`,
+						};
 					} catch (error) {
 						set.status = 400;
 						if (error instanceof Error) {
