@@ -1,9 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { Elysia, t } from "elysia";
-
 import { DatabaseError } from "pg";
+
 import { db } from "../db";
 import { ambassadors, communities } from "../db/schema";
+import { sendEmail } from "../email";
 import { log } from "../log";
 
 export const community = (app: Elysia) =>
@@ -27,6 +28,13 @@ export const community = (app: Elysia) =>
 							id: randomUUID(),
 							...body,
 						});
+
+						await sendEmail(
+							body.ambassador_name,
+							body.ambassador_email,
+							"Ambassador Registration",
+							"Congratulations! You have successfully registered as an ambassador!",
+						);
 					} catch (error) {
 						if (
 							error instanceof DatabaseError &&
@@ -83,6 +91,13 @@ export const community = (app: Elysia) =>
 							id: randomUUID(),
 							...body,
 						});
+
+						await sendEmail(
+							body.community_lead_name,
+							body.community_email,
+							"Community Registration",
+							"Congratulations! You have successfully registered as a community collaborator!",
+						);
 					} catch (error) {
 						if (
 							error instanceof DatabaseError &&

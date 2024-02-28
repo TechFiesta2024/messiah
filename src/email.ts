@@ -3,25 +3,42 @@ export const sendEmail = async (
 	toEmail: string,
 	subject: string,
 	body: string,
-) => {
-	await fetch("from the env", {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-			"api-key": "from	env",
+): Promise<string | Error> => {
+	const hermesUrl = process.env.HERMES_URL;
+	const hermesApiKey = process.env.HERMES_API_KEY;
+	const email = process.env.EMAIL;
+
+	if (!hermesUrl || !hermesApiKey || !email) {
+		throw new Error("Email not configured");
+	}
+
+	const emailData = {
+		from: {
+			name: "TechFiesta Team",
+			email: email,
 		},
-		body: JSON.stringify({
-			from: {
-				name: "TechFiesta24 Tech Team",
-				email: "env",
+		to: {
+			name: toName,
+			email: toEmail,
+		},
+		subject,
+		body,
+	};
+
+	try {
+		const response = await fetch(hermesUrl, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"api-key": hermesApiKey,
 			},
-			to: {
-				name: toName,
-				email: toEmail,
-			},
-			subject,
-			body,
-		}),
-	});
-	return "email";
+			body: JSON.stringify(emailData),
+		});
+		if (!response.ok) {
+			throw new Error(`Email not sent. Rest API error: ${response.body}`);
+		}
+		return "Email sent successfully!";
+	} catch (error) {
+		throw new Error(`Hermes Error. Error: ${error}`);
+	}
 };

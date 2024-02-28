@@ -5,6 +5,7 @@ import { Elysia, t } from "elysia";
 
 import { db } from "../db";
 import { users } from "../db/schema";
+import { sendEmail } from "../email";
 import { log } from "../log";
 
 export const user = (app: Elysia) =>
@@ -28,33 +29,50 @@ export const user = (app: Elysia) =>
 				async ({ log, body, setCookie }) => {
 					log.info(body);
 
-					const userExists = await db
-						.select({ id: users.id, name: users.name })
-						.from(users)
-						.where(eq(users.email, body.email));
+					try {
+						const userExists = await db
+							.select({ id: users.id, name: users.name })
+							.from(users)
+							.where(eq(users.email, body.email));
 
-					if (userExists && userExists.length > 0) {
-						setCookie("user", userExists[0].id);
+						if (userExists && userExists.length > 0) {
+							setCookie("user", userExists[0].id);
+
+							return {
+								message: `welcome back ${userExists[0].name}`,
+							};
+						}
+
+						const res = await db
+							.insert(users)
+							.values({
+								id: randomUUID(),
+								...body,
+								workshops: [],
+							})
+							.returning({
+								id: users.id,
+								name: users.name,
+								email: users.email,
+							});
+
+						await sendEmail(
+							res[0].name,
+							res[0].email,
+							"Welcome",
+							"Welcome to TechFiesta!",
+						);
+
+						setCookie("user", res[0].id);
 
 						return {
-							message: `welcome back ${userExists[0].name}`,
+							message: `welcome ${body.name}`,
 						};
+					} catch (error) {
+						if (error instanceof Error) {
+							throw new Error(error.message);
+						}
 					}
-
-					const res = await db
-						.insert(users)
-						.values({
-							id: randomUUID(),
-							...body,
-							workshops: [],
-						})
-						.returning({ id: users.id });
-
-					setCookie("user", res[0].id);
-
-					return {
-						message: `welcome ${body.name}`,
-					};
 				},
 				{
 					body: t.Object({
