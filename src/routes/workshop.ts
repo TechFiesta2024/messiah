@@ -101,9 +101,31 @@ export const workshop = (app: Elysia) =>
 					detail: {
 						summary: "Join a workshop",
 						description:
-							"Join a workshop by providing the workshop id",
+							"Join a workshop by providing the id of the workshop",
+						parameters: [
+							{
+								name: "id",
+								in: "path",
+								schema: { type: "string" },
+								required: true,
+								description:
+									"product_design | hardware | cad | ctf",
+							},
+						],
 						responses: {
-							200: { description: "Success" },
+							200: {
+								description: "Success",
+								content: {
+									"application/json": {
+										schema: {
+											type: "object",
+											properties: {
+												message: { type: "string" },
+											},
+										},
+									},
+								},
+							},
 							400: {
 								description:
 									"Invalid workshop | User tampered with the cookie",

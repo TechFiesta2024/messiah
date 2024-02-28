@@ -26,7 +26,7 @@ export const sendEmail = async (
 	};
 
 	try {
-		const response = await fetch(hermesUrl, {
+		const response = await fetch(`${hermesUrl}/send`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

@@ -8,7 +8,7 @@ import { health_check } from "./routes/health_check";
 import { user } from "./routes/user";
 import { workshop } from "./routes/workshop";
 
-new Elysia()
+const app = new Elysia()
 	.use(
 		swagger({
 			path: "/docs",
@@ -27,3 +27,5 @@ new Elysia()
 	.use(user)
 	.use(health_check)
 	.listen(process.env.PORT || 3000);
+
+export type App = typeof app;

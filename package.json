@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.5.3",
+    "@elysiajs/eden": "^0.8.1",
     "@types/pg": "^8.11.0",
     "bun-types": "latest",
     "drizzle-kit": "^0.20.14"
