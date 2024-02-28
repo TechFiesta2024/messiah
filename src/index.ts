@@ -9,18 +9,18 @@ import { user } from "./routes/user";
 import { workshop } from "./routes/workshop";
 
 new Elysia()
-	.use(log)
 	.use(
 		swagger({
 			path: "/docs",
 			documentation: {
 				info: {
 					title: "messiah",
-					version: "0.1.0",
+					version: "0.3.0",
 				},
 			},
 		}),
 	)
+	.use(log)
 	.use(cors())
 	.use(community)
 	.use(workshop)
