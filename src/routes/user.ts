@@ -138,7 +138,26 @@ export const user = (app: Elysia) =>
 						summary: "Get user details",
 						description: "Get the details of the logged in user",
 						responses: {
-							200: { description: "Success" },
+							200: {
+								description: "Success",
+								content: {
+									"application/json": {
+										schema: {
+											type: "object",
+											properties: {
+												id: { type: "string" },
+												name: { type: "string" },
+												email: { type: "string" },
+												college: { type: "string" },
+												contact: { type: "string" },
+												stream: { type: "string" },
+												year: { type: "string" },
+												workshops: { type: "string" },
+											},
+										},
+									},
+								},
+							},
 							401: { description: "User not logged in" },
 							500: { description: "Internal server error" },
 						},
