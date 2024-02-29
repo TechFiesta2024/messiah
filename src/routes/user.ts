@@ -1,5 +1,4 @@
 import { randomUUID } from "node:crypto";
-import { cookie } from "@elysiajs/cookie";
 import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 
@@ -12,11 +11,6 @@ export const user = (app: Elysia) =>
 	app.group("/user", (app) =>
 		app
 			.use(log)
-			.use(
-				cookie({
-					httpOnly: true,
-				}),
-			)
 			.onError((ctx) => {
 				ctx.log.error(ctx.error.message);
 
@@ -26,7 +20,7 @@ export const user = (app: Elysia) =>
 			})
 			.post(
 				"/login",
-				async ({ log, body, setCookie }) => {
+				async ({ log, body, cookie: { user } }) => {
 					log.info(body);
 
 					try {
@@ -36,7 +30,7 @@ export const user = (app: Elysia) =>
 							.where(eq(users.email, body.email));
 
 						if (userExists && userExists.length > 0) {
-							setCookie("user", userExists[0].id);
+							user.value = userExists[0].id;
 
 							return {
 								message: `welcome back ${userExists[0].name}`,
@@ -63,7 +57,7 @@ export const user = (app: Elysia) =>
 							"Welcome to TechFiesta!",
 						);
 
-						setCookie("user", res[0].id);
+						user.value = res[0].id;
 
 						return {
 							message: `welcome ${body.name}`,
@@ -102,9 +96,46 @@ export const user = (app: Elysia) =>
 				},
 			)
 			.post(
+				"/checkEmail",
+				async ({ body: { email }, cookie: { user } }) => {
+					const userExists = await db
+						.select({ id: users.id, name: users.name })
+						.from(users)
+						.where(eq(users.email, email));
+
+					if (userExists && userExists.length > 0) {
+						user.value = userExists[0].id;
+
+						return {
+							message: `welcome back ${userExists[0].name}!`,
+						};
+					}
+
+					return {
+						message: "user does not exist",
+					};
+				},
+				{
+					body: t.Object({
+						email: t.String({
+							format: "email",
+							errror: "invalid email",
+						}),
+					}),
+					detail: {
+						summary: "Check Email",
+						description: "Logout the user",
+						responses: {
+							200: { description: "Success" },
+						},
+						tags: ["user"],
+					},
+				},
+			)
+			.post(
 				"/logout",
 				({ cookie: { user } }) => {
-					user.remove;
+					user.remove();
 					return {
 						message: "adios senor!",
 					};
@@ -123,7 +154,7 @@ export const user = (app: Elysia) =>
 			.get(
 				"/me",
 				async ({ set, cookie: { user } }) => {
-					if (!user) {
+					if (!user.value) {
 						set.status = 401;
 						throw new Error("user not logged in");
 					}
@@ -131,33 +162,17 @@ export const user = (app: Elysia) =>
 					return await db
 						.select()
 						.from(users)
-						.where(eq(users.id, user));
+						.where(eq(users.id, user.value));
 				},
 				{
+					cookie: t.Cookie({
+						user: t.Optional(t.String({})),
+					}),
 					detail: {
 						summary: "Get user details",
 						description: "Get the details of the logged in user",
 						responses: {
-							200: {
-								description: "Success",
-								content: {
-									"application/json": {
-										schema: {
-											type: "object",
-											properties: {
-												id: { type: "string" },
-												name: { type: "string" },
-												email: { type: "string" },
-												college: { type: "string" },
-												contact: { type: "string" },
-												stream: { type: "string" },
-												year: { type: "string" },
-												workshops: { type: "string" },
-											},
-										},
-									},
-								},
-							},
+							200: { description: "Success" },
 							401: { description: "User not logged in" },
 							500: { description: "Internal server error" },
 						},

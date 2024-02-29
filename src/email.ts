@@ -3,7 +3,15 @@ export const sendEmail = async (
 	toEmail: string,
 	subject: string,
 	body: string,
-): Promise<string | Error> => {
+) => {
+	if (process.env.NODE_ENV !== "production") {
+		console.log("Email sent in development mode");
+		console.log(
+			`To: ${toName} <${toEmail}>\nFrom: TechFiesta Team <${process.env.EMAIL}>\nSubject: ${subject}\nBody: ${body}`,
+		);
+		return "Email sent successfully!";
+	}
+
 	const hermesUrl = process.env.HERMES_URL;
 	const hermesApiKey = process.env.HERMES_API_KEY;
 	const email = process.env.EMAIL;
