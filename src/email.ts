@@ -30,7 +30,7 @@ export const sendEmail = async (
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				"api-key": hermesApiKey,
+				"x-api-key": hermesApiKey,
 			},
 			body: JSON.stringify(emailData),
 		});
