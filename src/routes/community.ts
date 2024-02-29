@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { Elysia, t } from "elysia";
-import { DatabaseError } from "pg";
+import { PostgresError } from "postgres";
 
 import { db } from "../db";
 import { ambassadors, communities } from "../db/schema";
@@ -37,7 +37,7 @@ export const community = (app: Elysia) =>
 						);
 					} catch (error) {
 						if (
-							error instanceof DatabaseError &&
+							error instanceof PostgresError &&
 							error.code === "23505"
 						) {
 							set.status = 409;
@@ -100,7 +100,7 @@ export const community = (app: Elysia) =>
 						);
 					} catch (error) {
 						if (
-							error instanceof DatabaseError &&
+							error instanceof PostgresError &&
 							error.code === "23505"
 						) {
 							set.status = 409;
