@@ -1,27 +1,5 @@
 import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
-/* unique workshop array elements
-CREATE OR REPLACE FUNCTION enforce_unique_elements()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF (
-    SELECT COUNT(DISTINCT element)
-    FROM unnest(NEW.workshops) element
-  ) <> cardinality(NEW.workshops)
-  THEN
-RAISE EXCEPTION 'you have already joined this workshop';
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER check_unique_elements
-BEFORE INSERT OR UPDATE
-ON users
-FOR EACH ROW
-EXECUTE FUNCTION enforce_unique_elements();
-*/
-
 export const users = pgTable("users", {
 	id: uuid("id").primaryKey(),
 	createAt: timestamp("create_at").notNull().defaultNow(),
