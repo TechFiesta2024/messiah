@@ -21,7 +21,11 @@ const app = new Elysia()
 		}),
 	)
 	.use(log)
-	.use(cors())
+	.use(
+		cors({
+			credentials: true,
+		}),
+	)
 	.use(community)
 	.use(workshop)
 	.use(user)
