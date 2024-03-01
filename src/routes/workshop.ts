@@ -1,4 +1,3 @@
-import { cookie } from "@elysiajs/cookie";
 import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 
@@ -54,11 +53,6 @@ export const workshop = (app: Elysia) =>
 	app.group("/workshop", (app) =>
 		app
 			.use(log)
-			.use(
-				cookie({
-					httpOnly: true,
-				}),
-			)
 			.onError((ctx) => {
 				ctx.log.error(ctx.error.message);
 				return {
@@ -68,14 +62,17 @@ export const workshop = (app: Elysia) =>
 			.post(
 				"/join/:id",
 				async ({ set, log, cookie: { user }, params: { id } }) => {
-					if (!user) {
+					if (!user.value) {
 						set.status = 401;
 						throw new Error("user not logged in");
 					}
 					log.info({ user, id });
 
 					try {
-						const updatedUser = await updateWorkshop(user, id);
+						const updatedUser = await updateWorkshop(
+							user.value,
+							id,
+						);
 
 						await sendEmail(
 							updatedUser.name,
@@ -97,6 +94,9 @@ export const workshop = (app: Elysia) =>
 				{
 					params: t.Object({
 						id: t.String({}),
+					}),
+					cookie: t.Cookie({
+						user: t.Optional(t.String({})),
 					}),
 					detail: {
 						summary: "Join a workshop",
