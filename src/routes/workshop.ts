@@ -95,9 +95,14 @@ export const workshop = (app: Elysia) =>
 					params: t.Object({
 						id: t.String({}),
 					}),
-					cookie: t.Cookie({
-						user: t.Optional(t.String({})),
-					}),
+					cookie: t.Cookie(
+						{
+							user: t.Optional(t.String({})),
+						},
+						{
+							httpOnly: true,
+						},
+					),
 					detail: {
 						summary: "Join a workshop",
 						description:
