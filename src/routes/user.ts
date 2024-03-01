@@ -84,6 +84,14 @@ export const user = (app: Elysia) =>
 						stream: t.String(),
 						year: t.String(),
 					}),
+					cookie: t.Cookie(
+						{
+							user: t.Optional(t.String({})),
+						},
+						{
+							httpOnly: true,
+						},
+					),
 					detail: {
 						summary: "Register as a user",
 						description: "Register as a user and get a cookie",
@@ -97,7 +105,7 @@ export const user = (app: Elysia) =>
 			)
 			.post(
 				"/checkEmail",
-				async ({ body: { email }, cookie: { user } }) => {
+				async ({ body: { email }, cookie: { user }, set }) => {
 					const userExists = await db
 						.select({ id: users.id, name: users.name })
 						.from(users)
@@ -111,6 +119,7 @@ export const user = (app: Elysia) =>
 						};
 					}
 
+					set.status = 401;
 					return {
 						message: "user does not exist",
 					};
@@ -122,9 +131,17 @@ export const user = (app: Elysia) =>
 							errror: "invalid email",
 						}),
 					}),
+					cookie: t.Cookie(
+						{
+							user: t.Optional(t.String({})),
+						},
+						{
+							httpOnly: true,
+						},
+					),
 					detail: {
 						summary: "Check Email",
-						description: "Logout the user",
+						description: "See if the user exists in the database",
 						responses: {
 							200: { description: "Success" },
 						},
@@ -135,12 +152,21 @@ export const user = (app: Elysia) =>
 			.post(
 				"/logout",
 				({ cookie: { user } }) => {
-					user.remove();
+					user.expires = new Date(); // wow 💖
+
 					return {
 						message: "adios senor!",
 					};
 				},
 				{
+					cookie: t.Cookie(
+						{
+							user: t.Optional(t.String({})),
+						},
+						{
+							httpOnly: true,
+						},
+					),
 					detail: {
 						summary: "Logout",
 						description: "Logout the user",
@@ -165,9 +191,14 @@ export const user = (app: Elysia) =>
 						.where(eq(users.id, user.value));
 				},
 				{
-					cookie: t.Cookie({
-						user: t.Optional(t.String({})),
-					}),
+					cookie: t.Cookie(
+						{
+							user: t.Optional(t.String({})),
+						},
+						{
+							httpOnly: true,
+						},
+					),
 					detail: {
 						summary: "Get user details",
 						description: "Get the details of the logged in user",
