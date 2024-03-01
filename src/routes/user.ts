@@ -141,9 +141,11 @@ export const user = (app: Elysia) =>
 					),
 					detail: {
 						summary: "Check Email",
-						description: "See if the user exists in the database",
+						description:
+							"See if the user exists in the database and set a cookie",
 						responses: {
 							200: { description: "Success" },
+							401: { description: "User does not exist" },
 						},
 						tags: ["user"],
 					},
