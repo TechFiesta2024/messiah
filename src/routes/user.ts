@@ -30,6 +30,8 @@ export const user = (app: Elysia) =>
 						if (userExists && userExists.length > 0) {
 							userUUID.value = userExists[0].id;
 							userUUID.httpOnly = true;
+							userUUID.domain = "localhost";
+							userUUID.secure = false;
 							userUUID.path = "/";
 
 							log.info(`user ${userExists[0].name} logged in`);
@@ -60,6 +62,8 @@ export const user = (app: Elysia) =>
 
 						userUUID.value = res[0].id;
 						userUUID.httpOnly = true;
+						userUUID.domain = "localhost";
+						userUUID.secure = false;
 						userUUID.path = "/";
 
 						return {
@@ -113,6 +117,8 @@ export const user = (app: Elysia) =>
 					if (userExists && userExists.length > 0) {
 						userUUID.value = userExists[0].id;
 						userUUID.httpOnly = true;
+						userUUID.domain = "localhost";
+						userUUID.secure = false;
 						userUUID.path = "/";
 
 						return {
