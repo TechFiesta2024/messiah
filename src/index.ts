@@ -20,16 +20,16 @@ const app = new Elysia()
 			},
 		}),
 	)
-	.use(log)
 	.use(
 		cors({
-			credentials: true,
+			allowedHeaders: ["Content-Type"],
 		}),
 	)
 	.use(community)
 	.use(workshop)
 	.use(user)
 	.use(health_check)
+	.use(log)
 	.listen(process.env.PORT || 3000);
 
 export type App = typeof app;
