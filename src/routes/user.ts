@@ -20,9 +20,7 @@ export const user = (app: Elysia) =>
 			})
 			.post(
 				"/login",
-				async ({ log, body, cookie: { user } }) => {
-					log.info(body);
-
+				async ({ log, body, cookie: { userUUID } }) => {
 					try {
 						const userExists = await db
 							.select({ id: users.id, name: users.name })
@@ -30,8 +28,11 @@ export const user = (app: Elysia) =>
 							.where(eq(users.email, body.email));
 
 						if (userExists && userExists.length > 0) {
-							user.value = userExists[0].id;
+							userUUID.value = userExists[0].id;
+							userUUID.httpOnly = true;
+							userUUID.path = "/";
 
+							log.info(`user ${userExists[0].name} logged in`);
 							return {
 								message: `welcome back ${userExists[0].name}`,
 							};
@@ -57,7 +58,9 @@ export const user = (app: Elysia) =>
 							"Welcome to TechFiesta!",
 						);
 
-						user.value = res[0].id;
+						userUUID.value = res[0].id;
+						userUUID.httpOnly = true;
+						userUUID.path = "/";
 
 						return {
 							message: `welcome ${body.name}`,
@@ -84,14 +87,9 @@ export const user = (app: Elysia) =>
 						stream: t.String(),
 						year: t.String(),
 					}),
-					cookie: t.Cookie(
-						{
-							user: t.Optional(t.String({})),
-						},
-						{
-							httpOnly: true,
-						},
-					),
+					cookie: t.Cookie({
+						userUUID: t.Optional(t.String({})),
+					}),
 					detail: {
 						summary: "Register as a user",
 						description: "Register as a user and get a cookie",
@@ -105,14 +103,17 @@ export const user = (app: Elysia) =>
 			)
 			.post(
 				"/checkEmail",
-				async ({ body: { email }, cookie: { user }, set }) => {
+				async ({ log, body: { email }, cookie: { userUUID }, set }) => {
+					log.info(`checking if user with email ${email} exists`);
 					const userExists = await db
 						.select({ id: users.id, name: users.name })
 						.from(users)
 						.where(eq(users.email, email));
 
 					if (userExists && userExists.length > 0) {
-						user.value = userExists[0].id;
+						userUUID.value = userExists[0].id;
+						userUUID.httpOnly = true;
+						userUUID.path = "/";
 
 						return {
 							message: `welcome back ${userExists[0].name}!`,
@@ -131,14 +132,9 @@ export const user = (app: Elysia) =>
 							errror: "invalid email",
 						}),
 					}),
-					cookie: t.Cookie(
-						{
-							user: t.Optional(t.String({})),
-						},
-						{
-							httpOnly: true,
-						},
-					),
+					cookie: t.Cookie({
+						userUUID: t.Optional(t.String({})),
+					}),
 					detail: {
 						summary: "Check Email",
 						description:
@@ -153,22 +149,17 @@ export const user = (app: Elysia) =>
 			)
 			.post(
 				"/logout",
-				({ cookie: { user } }) => {
-					user.expires = new Date(); // wow 💖
+				({ cookie: { userUUID } }) => {
+					userUUID.expires = new Date(); // wow 💖
 
 					return {
 						message: "adios senor!",
 					};
 				},
 				{
-					cookie: t.Cookie(
-						{
-							user: t.Optional(t.String({})),
-						},
-						{
-							httpOnly: true,
-						},
-					),
+					cookie: t.Cookie({
+						user: t.Optional(t.String({})),
+					}),
 					detail: {
 						summary: "Logout",
 						description: "Logout the user",
@@ -181,8 +172,8 @@ export const user = (app: Elysia) =>
 			)
 			.get(
 				"/me",
-				async ({ set, cookie: { user } }) => {
-					if (!user.value) {
+				async ({ set, cookie: { userUUID } }) => {
+					if (!userUUID.value) {
 						set.status = 401;
 						throw new Error("user not logged in");
 					}
@@ -190,17 +181,12 @@ export const user = (app: Elysia) =>
 					return await db
 						.select()
 						.from(users)
-						.where(eq(users.id, user.value));
+						.where(eq(users.id, userUUID.value));
 				},
 				{
-					cookie: t.Cookie(
-						{
-							user: t.Optional(t.String({})),
-						},
-						{
-							httpOnly: true,
-						},
-					),
+					cookie: t.Cookie({
+						userUUID: t.Optional(t.String({})),
+					}),
 					detail: {
 						summary: "Get user details",
 						description: "Get the details of the logged in user",
