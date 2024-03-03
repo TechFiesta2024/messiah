@@ -16,7 +16,7 @@ const updateWorkshop = async (userId: string, workshop: string) => {
 	const userInfo = await db.select().from(users).where(eq(users.id, userId));
 
 	if (userInfo.length !== 1) {
-		throw new Error("User not found");
+		throw new Error("user not found");
 	}
 
 	if (["product_design", "hardware", "cad", "ctf"].includes(workshop)) {
@@ -46,7 +46,7 @@ const updateWorkshop = async (userId: string, workshop: string) => {
 		return updatedUser[0];
 	}
 
-	throw new Error("Workshop not found");
+	throw new Error("workshop not found");
 };
 
 export const workshop = (app: Elysia) =>
@@ -61,18 +61,16 @@ export const workshop = (app: Elysia) =>
 			})
 			.post(
 				"/join/:id",
-				async ({ set, log, cookie: { user }, params: { id } }) => {
-					if (!user.value) {
+				async ({ set, log, headers: { userid }, params: { id } }) => {
+					if (!userid) {
 						set.status = 401;
 						throw new Error("user not logged in");
 					}
-					log.info({ user, id });
 
 					try {
-						const updatedUser = await updateWorkshop(
-							user.value,
-							id,
-						);
+						const updatedUser = await updateWorkshop(userid, id);
+
+						log.info(`user ${updatedUser.name} joined ${id}`);
 
 						await sendEmail(
 							updatedUser.name,
@@ -95,14 +93,9 @@ export const workshop = (app: Elysia) =>
 					params: t.Object({
 						id: t.String({}),
 					}),
-					cookie: t.Cookie(
-						{
-							user: t.Optional(t.String({})),
-						},
-						{
-							httpOnly: true,
-						},
-					),
+					headers: t.Object({
+						userid: t.Optional(t.String()),
+					}),
 					detail: {
 						summary: "Join a workshop",
 						description:
