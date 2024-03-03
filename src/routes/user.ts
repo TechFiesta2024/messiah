@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
+import { cookie } from "@elysiajs/cookie";
 
 import { db } from "../db";
 import { users } from "../db/schema";
@@ -11,6 +12,7 @@ export const user = (app: Elysia) =>
 	app.group("/user", (app) =>
 		app
 			.use(log)
+			.use(cookie)
 			.onError((ctx) => {
 				ctx.log.error(ctx.error.message);
 
@@ -20,7 +22,7 @@ export const user = (app: Elysia) =>
 			})
 			.post(
 				"/login",
-				async ({ log, body, cookie: { userUUID } }) => {
+				async ({ log, body, setCookie }) => {
 					try {
 						const userExists = await db
 							.select({ id: users.id, name: users.name })
@@ -28,12 +30,13 @@ export const user = (app: Elysia) =>
 							.where(eq(users.email, body.email));
 
 						if (userExists && userExists.length > 0) {
-							userUUID.value = userExists[0].id;
-							userUUID.httpOnly = true;
-							userUUID.path = "/";
-							userUUID.expires = new Date(
-								Date.now() + 1000 * 60 * 60 * 24 * 7,
-							);
+							setCookie("userUUID", userExists[0].id, {
+								httpOnly: true,
+								path: "/",
+								expires: new Date(
+									Date.now() + 1000 * 60 * 60 * 24 * 7,
+								),
+							});
 
 							log.info(`user ${userExists[0].name} logged in`);
 							return {
@@ -61,12 +64,13 @@ export const user = (app: Elysia) =>
 							"Welcome to TechFiesta!",
 						);
 
-						userUUID.value = res[0].id;
-						userUUID.httpOnly = true;
-						userUUID.path = "/";
-						userUUID.expires = new Date(
-							Date.now() + 1000 * 60 * 60 * 24 * 7,
-						);
+						setCookie("userUUID", res[0].id, {
+							httpOnly: true,
+							path: "/",
+							expires: new Date(
+								Date.now() + 1000 * 60 * 60 * 24 * 7,
+							),
+						});
 
 						return {
 							message: `welcome ${body.name}`,
@@ -93,9 +97,6 @@ export const user = (app: Elysia) =>
 						stream: t.String(),
 						year: t.String(),
 					}),
-					cookie: t.Cookie({
-						userUUID: t.Optional(t.String({})),
-					}),
 					detail: {
 						summary: "Register as a user",
 						description: "Register as a user and get a cookie",
@@ -109,7 +110,7 @@ export const user = (app: Elysia) =>
 			)
 			.post(
 				"/checkEmail",
-				async ({ log, body: { email }, cookie: { userUUID }, set }) => {
+				async ({ log, body: { email }, setCookie, set }) => {
 					log.info(`checking if user with email ${email} exists`);
 					const userExists = await db
 						.select({ id: users.id, name: users.name })
@@ -117,12 +118,13 @@ export const user = (app: Elysia) =>
 						.where(eq(users.email, email));
 
 					if (userExists && userExists.length > 0) {
-						userUUID.value = userExists[0].id;
-						userUUID.httpOnly = true;
-						userUUID.path = "/";
-						userUUID.expires = new Date(
-							Date.now() + 1000 * 60 * 60 * 24 * 7,
-						);
+						setCookie("userUUID", userExists[0].id, {
+							httpOnly: true,
+							path: "/",
+							expires: new Date(
+								Date.now() + 1000 * 60 * 60 * 24 * 7,
+							),
+						});
 
 						return {
 							message: `welcome back ${userExists[0].name}!`,
@@ -141,9 +143,6 @@ export const user = (app: Elysia) =>
 							errror: "invalid email",
 						}),
 					}),
-					cookie: t.Cookie({
-						userUUID: t.Optional(t.String({})),
-					}),
 					detail: {
 						summary: "Check Email",
 						description:
@@ -158,17 +157,15 @@ export const user = (app: Elysia) =>
 			)
 			.post(
 				"/logout",
-				({ cookie: { userUUID } }) => {
-					userUUID.expires = new Date(); // wow 💖
+				({ removeCookie }) => {
+					// userUUID.expires = new Date(); // wow 💖
+					removeCookie("userUUID");
 
 					return {
 						message: "adios senor!",
 					};
 				},
 				{
-					cookie: t.Cookie({
-						user: t.Optional(t.String({})),
-					}),
 					detail: {
 						summary: "Logout",
 						description: "Logout the user",
