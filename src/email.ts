@@ -20,6 +20,7 @@ export const sendEmail = async (
 		throw new Error("Email not configured");
 	}
 
+	// Change
 	const emailData = {
 		from: {
 			name: "TechFiesta Team",

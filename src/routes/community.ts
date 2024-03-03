@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { Elysia, t } from "elysia";
+import postgres from "postgres";
 
 import { db } from "../db";
 import { ambassadors, communities } from "../db/schema";
@@ -35,14 +36,15 @@ export const community = (app: Elysia) =>
 							"Congratulations! You have successfully registered as an ambassador!",
 						);
 					} catch (error) {
-						// if (
-						// 	error instanceof PostgresError &&
-						// 	error.code === "23505"
-						// ) {
-						log.error(error);
-						set.status = 409;
-						throw new Error("ambassador already exists");
-						// }
+						if (
+							error instanceof postgres.PostgresError &&
+							error.code === "23505"
+						) {
+							log.error(error.message);
+							set.status = 409;
+							throw new Error("ambassador already exists");
+						}
+						throw error;
 					}
 
 					return {
@@ -99,13 +101,15 @@ export const community = (app: Elysia) =>
 							"Congratulations! You have successfully registered as a community collaborator!",
 						);
 					} catch (error) {
-						// if (
-						// 	error instanceof PostgresError &&
-						// 	error.code === "23505"
-						// ) {
-						set.status = 409;
-						throw new Error("community already exists");
-						// }
+						if (
+							error instanceof postgres.PostgresError &&
+							error.code === "23505"
+						) {
+							log.error(error.message);
+							set.status = 409;
+							throw new Error("community already exists");
+						}
+						throw error;
 					}
 
 					return {

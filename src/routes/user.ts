@@ -21,49 +21,48 @@ export const user = (app: Elysia) =>
 			.post(
 				"/login",
 				async ({ log, body }) => {
-					try {
-						const userExists = await db
-							.select({ id: users.id, name: users.name })
-							.from(users)
-							.where(eq(users.email, body.email));
+					log.info(body);
 
-						if (userExists && userExists.length > 0) {
-							log.info(`user ${userExists[0].name} logged in`);
-							return {
-								message: `welcome back ${userExists[0].name}`,
-								userid: userExists[0].id,
-							};
-						}
+					const userExists = await db
+						.select({ id: users.id, name: users.name })
+						.from(users)
+						.where(eq(users.email, body.email));
 
-						const res = await db
-							.insert(users)
-							.values({
-								id: randomUUID(),
-								...body,
-								workshops: [],
-							})
-							.returning({
-								id: users.id,
-								name: users.name,
-								email: users.email,
-							});
-
-						await sendEmail(
-							res[0].name,
-							res[0].email,
-							"Welcome",
-							"Welcome to TechFiesta!",
-						);
+					if (userExists && userExists.length > 0) {
+						log.info(`user ${userExists[0].name} logged in`);
 
 						return {
-							message: `welcome ${body.name}`,
-							userid: res[0].id,
+							message: `welcome back ${userExists[0].name}`,
+							userid: userExists[0].id,
 						};
-					} catch (error) {
-						if (error instanceof Error) {
-							throw new Error(error.message);
-						}
 					}
+
+					const res = await db
+						.insert(users)
+						.values({
+							id: randomUUID(),
+							...body,
+							workshops: [],
+						})
+						.returning({
+							id: users.id,
+							name: users.name,
+							email: users.email,
+						});
+
+					log.info(`new user ${res[0].name} logged in`);
+
+					await sendEmail(
+						res[0].name,
+						res[0].email,
+						"Welcome",
+						"Welcome to TechFiesta!",
+					);
+
+					return {
+						message: `welcome ${body.name}`,
+						userid: res[0].id,
+					};
 				},
 				{
 					body: t.Object({
@@ -93,9 +92,10 @@ export const user = (app: Elysia) =>
 				},
 			)
 			.post(
-				"/checkEmail",
+				"/checkemail",
 				async ({ log, body: { email }, set }) => {
 					log.info(`checking if user with email ${email} exists`);
+
 					const userExists = await db
 						.select({ id: users.id, name: users.name })
 						.from(users)
@@ -134,11 +134,13 @@ export const user = (app: Elysia) =>
 			)
 			.get(
 				"/me",
-				async ({ set, headers: { userid } }) => {
+				async ({ log, set, headers: { userid } }) => {
 					if (!userid) {
 						set.status = 401;
 						throw new Error("user not logged in");
 					}
+
+					log.info(`getting user details for user ${userid}`);
 
 					return await db
 						.select()

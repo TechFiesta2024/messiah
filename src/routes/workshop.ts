@@ -16,7 +16,7 @@ const updateWorkshop = async (userId: string, workshop: string) => {
 	const userInfo = await db.select().from(users).where(eq(users.id, userId));
 
 	if (userInfo.length !== 1) {
-		throw new Error("User not found");
+		throw new Error("user not found");
 	}
 
 	if (["product_design", "hardware", "cad", "ctf"].includes(workshop)) {
@@ -46,7 +46,7 @@ const updateWorkshop = async (userId: string, workshop: string) => {
 		return updatedUser[0];
 	}
 
-	throw new Error("Workshop not found");
+	throw new Error("workshop not found");
 };
 
 export const workshop = (app: Elysia) =>
@@ -66,10 +66,11 @@ export const workshop = (app: Elysia) =>
 						set.status = 401;
 						throw new Error("user not logged in");
 					}
-					log.info({ userid, id });
 
 					try {
 						const updatedUser = await updateWorkshop(userid, id);
+
+						log.info(`user ${updatedUser.name} joined ${id}`);
 
 						await sendEmail(
 							updatedUser.name,
