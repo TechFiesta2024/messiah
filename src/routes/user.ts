@@ -31,7 +31,6 @@ export const user = (app: Elysia) =>
 							userUUID.value = userExists[0].id;
 							userUUID.httpOnly = true;
 							userUUID.path = "/";
-							userUUID.domain = ".ondigitalocean.app";
 							userUUID.expires = new Date(
 								Date.now() + 1000 * 60 * 60 * 24 * 7,
 							);
@@ -65,7 +64,6 @@ export const user = (app: Elysia) =>
 						userUUID.value = res[0].id;
 						userUUID.httpOnly = true;
 						userUUID.path = "/";
-						userUUID.domain = ".ondigitalocean.app";
 						userUUID.expires = new Date(
 							Date.now() + 1000 * 60 * 60 * 24 * 7,
 						);
@@ -122,7 +120,6 @@ export const user = (app: Elysia) =>
 						userUUID.value = userExists[0].id;
 						userUUID.httpOnly = true;
 						userUUID.path = "/";
-						userUUID.domain = ".ondigitalocean.app";
 						userUUID.expires = new Date(
 							Date.now() + 1000 * 60 * 60 * 24 * 7,
 						);
