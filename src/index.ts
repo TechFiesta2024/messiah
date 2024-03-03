@@ -20,11 +20,7 @@ const app = new Elysia()
 			},
 		}),
 	)
-	.use(
-		cors({
-			allowedHeaders: ["Content-Type"],
-		}),
-	)
+	.use(cors())
 	.use(community)
 	.use(workshop)
 	.use(user)
