@@ -31,6 +31,10 @@ export const user = (app: Elysia) =>
 							userUUID.value = userExists[0].id;
 							userUUID.httpOnly = true;
 							userUUID.path = "/";
+							userUUID.domain = ".ondigitalocean.app";
+							userUUID.expires = new Date(
+								Date.now() + 1000 * 60 * 60 * 24 * 7,
+							);
 
 							log.info(`user ${userExists[0].name} logged in`);
 							return {
@@ -61,6 +65,10 @@ export const user = (app: Elysia) =>
 						userUUID.value = res[0].id;
 						userUUID.httpOnly = true;
 						userUUID.path = "/";
+						userUUID.domain = ".ondigitalocean.app";
+						userUUID.expires = new Date(
+							Date.now() + 1000 * 60 * 60 * 24 * 7,
+						);
 
 						return {
 							message: `welcome ${body.name}`,
@@ -114,6 +122,10 @@ export const user = (app: Elysia) =>
 						userUUID.value = userExists[0].id;
 						userUUID.httpOnly = true;
 						userUUID.path = "/";
+						userUUID.domain = ".ondigitalocean.app";
+						userUUID.expires = new Date(
+							Date.now() + 1000 * 60 * 60 * 24 * 7,
+						);
 
 						return {
 							message: `welcome back ${userExists[0].name}!`,
