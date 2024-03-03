@@ -61,18 +61,15 @@ export const workshop = (app: Elysia) =>
 			})
 			.post(
 				"/join/:id",
-				async ({ set, log, cookie: { user }, params: { id } }) => {
-					if (!user.value) {
+				async ({ set, log, headers: { userid }, params: { id } }) => {
+					if (!userid) {
 						set.status = 401;
 						throw new Error("user not logged in");
 					}
-					log.info({ user, id });
+					log.info({ userid, id });
 
 					try {
-						const updatedUser = await updateWorkshop(
-							user.value,
-							id,
-						);
+						const updatedUser = await updateWorkshop(userid, id);
 
 						await sendEmail(
 							updatedUser.name,
@@ -95,14 +92,9 @@ export const workshop = (app: Elysia) =>
 					params: t.Object({
 						id: t.String({}),
 					}),
-					cookie: t.Cookie(
-						{
-							user: t.Optional(t.String({})),
-						},
-						{
-							httpOnly: true,
-						},
-					),
+					headers: t.Object({
+						userid: t.Optional(t.String()),
+					}),
 					detail: {
 						summary: "Join a workshop",
 						description:
