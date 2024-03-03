@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
+import { cookie } from "@elysiajs/cookie";
 import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
-import { cookie } from "@elysiajs/cookie";
 
 import { db } from "../db";
 import { users } from "../db/schema";
@@ -12,7 +12,7 @@ export const user = (app: Elysia) =>
 	app.group("/user", (app) =>
 		app
 			.use(log)
-			.use(cookie)
+			.use(cookie())
 			.onError((ctx) => {
 				ctx.log.error(ctx.error.message);
 
@@ -64,7 +64,7 @@ export const user = (app: Elysia) =>
 							"Welcome to TechFiesta!",
 						);
 
-						setCookie("userUUID", res[0].id, {
+						setCookie("userUUID", userExists[0].id, {
 							httpOnly: true,
 							path: "/",
 							expires: new Date(
