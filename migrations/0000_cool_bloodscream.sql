@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"email" text NOT NULL,
 	"college" text NOT NULL,
 	"stream" text NOT NULL,
+	"contact" text NOT NULL,
 	"year" text NOT NULL,
 	"workshops" text[] NOT NULL,
 	CONSTRAINT "users_email_unique" UNIQUE("email")

@@ -1,5 +1,5 @@
 {
-  "id": "fb007f05-2616-4e3b-bb0d-858c2b5b49c7",
+  "id": "f2f31bdf-b0be-45a5-8eec-f335648446f6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -175,6 +175,12 @@
         },
         "stream": {
           "name": "stream",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contact": {
+          "name": "contact",
           "type": "text",
           "primaryKey": false,
           "notNull": true
