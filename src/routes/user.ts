@@ -77,7 +77,6 @@ export const user = (app: Elysia) =>
 							name: users.name,
 							email: users.email,
 						});
-
 					log.info(`new user ${res[0].email} logged in`);
 
 					await sendEmail(
