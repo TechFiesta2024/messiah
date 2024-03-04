@@ -8,7 +8,7 @@ const pool = postgres({
 	host: process.env.DATABASE_HOST,
 	port: Number(process.env.DATABASE_PORT),
 	database: process.env.DATABASE_NAME,
-	// ssl: process.env.NODE_ENV === "production" ? "require" : false,
+	ssl: process.env.NODE_ENV === "production" ? "require" : false,
 });
 
 export const db = drizzle(pool, {
