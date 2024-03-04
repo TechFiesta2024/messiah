@@ -24,11 +24,39 @@ export const user = (app: Elysia) =>
 					log.info(body);
 
 					const userExists = await db
-						.select({ id: users.id, name: users.name })
+						.select()
 						.from(users)
 						.where(eq(users.email, body.email));
 
 					if (userExists && userExists.length > 0) {
+						// compare the body with the user and update the user
+						if (
+							userExists[0].name !== body.name ||
+							userExists[0].college !== body.college ||
+							userExists[0].contact !== body.contact ||
+							userExists[0].stream !== body.stream ||
+							userExists[0].year !== body.year
+						) {
+							await db
+								.update(users)
+								.set({
+									name: body.name,
+									college: body.college,
+									contact: body.contact,
+									stream: body.stream,
+									year: body.year,
+								})
+								.where(eq(users.email, body.email));
+
+							log.info(`user ${userExists[0].email} was updated`);
+
+							return {
+								message: `updated ${userExists[0].email}`,
+								userid: userExists[0].id,
+							};
+						}
+
+						// login user
 						log.info(`user ${userExists[0].name} logged in`);
 
 						return {
@@ -49,8 +77,7 @@ export const user = (app: Elysia) =>
 							name: users.name,
 							email: users.email,
 						});
-
-					log.info(`new user ${res[0].name} logged in`);
+					log.info(`new user ${res[0].email} logged in`);
 
 					await sendEmail(
 						res[0].name,
@@ -102,6 +129,7 @@ export const user = (app: Elysia) =>
 						.where(eq(users.email, email));
 
 					if (userExists && userExists.length > 0) {
+						log.info(`user ${email} logged in`);
 						return {
 							message: `welcome back ${userExists[0].name}!`,
 							userid: userExists[0].id,
