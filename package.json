@@ -5,16 +5,19 @@
     "db:generate": "drizzle-kit generate:pg --schema ./src/db/schema.ts --out=./migrations",
     "db:migrate": "bun run ./src/db/migrate.ts",
     "dev": "bun run --watch src/index.ts",
+    "email:dev": "email dev",
     "format": "biome check src --apply"
   },
   "dependencies": {
     "@bogeychan/elysia-logger": "^0.0.17",
     "@elysiajs/cors": "^0.8.0",
     "@elysiajs/swagger": "^0.8.5",
+    "@react-email/components": "0.0.15",
     "drizzle-orm": "^0.29.4",
     "elysia": "latest",
     "pino-pretty": "^10.3.1",
-    "postgres": "^3.4.3"
+    "postgres": "^3.4.3",
+    "react-email": "2.1.0"
   },
   "devDependencies": {
     "@biomejs/biome": "1.5.3",
