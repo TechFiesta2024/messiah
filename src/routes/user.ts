@@ -5,6 +5,7 @@ import { Elysia, t } from "elysia";
 import { db } from "../db";
 import { users } from "../db/schema";
 import { sendEmail } from "../email";
+import { welcome } from "../emails/welcome";
 import { log } from "../log";
 
 export const user = (app: Elysia) =>
@@ -82,8 +83,8 @@ export const user = (app: Elysia) =>
 					await sendEmail(
 						res[0].name,
 						res[0].email,
-						"Welcome",
-						"Welcome to TechFiesta!",
+						"Welcome To TechFiesta24 🎉",
+						welcome,
 					);
 
 					return {
