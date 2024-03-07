@@ -29,6 +29,7 @@ export const community = (app: Elysia) =>
 							...body,
 						});
 
+						// TODO: Send email to ambassador
 						await sendEmail(
 							body.ambassador_name,
 							body.ambassador_email,
