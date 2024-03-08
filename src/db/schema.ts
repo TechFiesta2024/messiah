@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -7,9 +8,10 @@ export const users = pgTable("users", {
 	email: text("email").notNull().unique(),
 	college: text("college").notNull(),
 	stream: text("stream").notNull(),
-	contact: text("contact").notNull(),
+	contact: text("contact").notNull().unique(),
 	year: text("year").notNull(),
 	workshops: text("workshops").array().notNull(),
+	team: text("team").references(() => teams.id),
 });
 
 export const communities = pgTable("communities", {
@@ -64,4 +66,40 @@ export const workshopCAD = pgTable("workshop_cad", {
 	college: text("college").notNull(),
 	stream: text("stream").notNull(),
 	year: text("year").notNull(),
+});
+
+export const teams = pgTable("teams", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull(),
+	leader_email: text("leader_email")
+		.references(() => users.email)
+		.notNull(),
+	leader_contact: text("leader_contact")
+		.references(() => users.contact)
+		.notNull(),
+	members: text("members").array().notNull(),
+	events: text("events").array(),
+});
+
+export const usersRelations = relations(users, ({ one }) => ({
+	teams: one(users),
+}));
+
+export const teamsRelations = relations(teams, ({ many, one }) => ({
+	leader_email: one(users, {
+		fields: [teams.leader_email],
+		references: [users.email],
+	}),
+	leader_contact: one(users, {
+		fields: [teams.leader_contact],
+		references: [users.contact],
+	}),
+	members: many(users),
+}));
+
+export const event_uiux = pgTable("event_uiux", {
+	team_name: text("name").notNull(),
+	leader_email: text("email").notNull().unique(),
+	leader_contact: text("contact").notNull().unique(),
+	isPaid: text("isPaid").default("no").notNull(),
 });

@@ -5,6 +5,7 @@ import { Elysia } from "elysia";
 import { log } from "./log";
 import { community } from "./routes/community";
 import { health_check } from "./routes/health_check";
+import { team } from "./routes/teams";
 import { user } from "./routes/user";
 import { workshop } from "./routes/workshop";
 
@@ -24,6 +25,7 @@ const app = new Elysia()
 	.use(community)
 	.use(workshop)
 	.use(user)
+	.use(team)
 	.use(health_check)
 	.use(log)
 	.listen(process.env.PORT || 3000);
