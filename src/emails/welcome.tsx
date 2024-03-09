@@ -52,9 +52,9 @@ const PropDefaults: NetlifyWelcomeEmailProps = {
 			),
 		},
 		{
-			id: 4,
+			id: 3,
 			Description: (
-				<li className="mb-20" key={4}>
+				<li className="mb-20" key={3}>
 					<strong>Any Questions?</strong> If you have any questions or
 					require additional information, feel free to reach out to
 					our dedicated support team at{" "}
@@ -67,7 +67,6 @@ const PropDefaults: NetlifyWelcomeEmailProps = {
 
 export const NetlifyWelcomeEmail = ({
 	steps = PropDefaults.steps,
-	links = PropDefaults.links,
 }: NetlifyWelcomeEmailProps) => {
 	return (
 		<Html>

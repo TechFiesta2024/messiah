@@ -2,52 +2,16 @@ import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 
 import { db } from "../db";
-import {
-	users,
-	workshopCAD,
-	workshopCTF,
-	workshopHardware,
-	workshopProduct,
-} from "../db/schema";
+import { college_users, workshops } from "../db/schema";
 import { sendEmail } from "../email";
 import { log } from "../log";
 
-const updateWorkshop = async (userId: string, workshop: string) => {
-	const userInfo = await db.select().from(users).where(eq(users.id, userId));
-
-	if (userInfo.length !== 1) {
-		throw new Error("user not found");
-	}
-
-	if (["product_design", "hardware", "cad", "ctf"].includes(workshop)) {
-		userInfo[0].workshops.push(workshop);
-
-		switch (workshop) {
-			case "product_design":
-				await db.insert(workshopProduct).values({ ...userInfo[0] });
-				break;
-			case "hardware":
-				await db.insert(workshopHardware).values({ ...userInfo[0] });
-				break;
-			case "cad":
-				await db.insert(workshopCAD).values({ ...userInfo[0] });
-				break;
-			case "ctf":
-				await db.insert(workshopCTF).values({ ...userInfo[0] });
-				break;
-		}
-
-		const updatedUser = await db
-			.update(users)
-			.set({ workshops: userInfo[0].workshops })
-			.where(eq(users.id, userId))
-			.returning({ name: users.name, email: users.email });
-
-		return updatedUser[0];
-	}
-
-	throw new Error("workshop not found");
-};
+enum category {
+	product_design = "product_design",
+	hardware = "hardware",
+	cad = "cad",
+	ctf = "ctf",
+}
 
 export const workshop = (app: Elysia) =>
 	app.group("/workshop", (app) =>
@@ -62,36 +26,42 @@ export const workshop = (app: Elysia) =>
 			.post(
 				"/join/:id",
 				async ({ set, log, headers: { userid }, params: { id } }) => {
+					log.info(`/workshop/join : ${id}`);
 					if (!userid) {
 						set.status = 401;
 						throw new Error("user not logged in");
 					}
 
-					try {
-						const updatedUser = await updateWorkshop(userid, id);
+					const user = await db.query.college_users.findFirst({
+						where: eq(college_users.id, userid),
+						with: {
+							workshop: true,
+						},
+					});
 
-						log.info(`user ${updatedUser.name} joined ${id}`);
-
-						await sendEmail(
-							updatedUser.name,
-							updatedUser.email,
-							"Workshop Joined",
-							`Congratulations ${updatedUser.name}, you have successfully joined the ${id}!`,
-						);
-
-						return {
-							message: `Congratulations ${updatedUser.name}, you have successfully joined the ${id}!`,
-						};
-					} catch (error) {
+					if (!user) {
 						set.status = 400;
-						if (error instanceof Error) {
-							throw new Error(error.message);
-						}
+						throw new Error("user not found");
 					}
+
+					if (user.workshop.some((obj) => obj.category === id)) {
+						return {
+							message: "Already joined",
+						};
+					}
+
+					await db.insert(workshops).values({
+						category: id as category,
+						user_email: user.email,
+					});
+
+					return {
+						message: "Successfully joined",
+					};
 				},
 				{
 					params: t.Object({
-						id: t.String({}),
+						id: t.Enum(category),
 					}),
 					headers: t.Object({
 						userid: t.Optional(t.String()),

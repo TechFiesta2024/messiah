@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 
 import { db } from "../db";
-import { users } from "../db/schema";
+import { college_users, school_users } from "../db/schema";
 import { sendEmail } from "../email";
 import { welcome } from "../emails/welcome";
 import { log } from "../log";
@@ -20,76 +20,47 @@ export const user = (app: Elysia) =>
 				};
 			})
 			.post(
-				"/login",
+				"/college",
 				async ({ log, body }) => {
-					log.info(body);
+					log.info(`/user/college : ${body.email}`);
 
-					const userExists = await db
-						.select()
-						.from(users)
-						.where(eq(users.email, body.email));
+					// const userExists = await db.query.college_users.findFirst({
+					// 	where: eq(college_users.email, body.email),
+					// });
+					//
+					// if (userExists) {
+					// 	log.info(`user ${userExists.email} logged in`);
+					//
+					// 	return {
+					// 		message: `Welcome back ${userExists.name}`,
+					// 		userid: userExists.id,
+					// 	};
+					// }
 
-					if (userExists && userExists.length > 0) {
-						// compare the body with the user and update the user
-						if (
-							userExists[0].name !== body.name ||
-							userExists[0].college !== body.college ||
-							userExists[0].contact !== body.contact ||
-							userExists[0].stream !== body.stream ||
-							userExists[0].year !== body.year
-						) {
-							await db
-								.update(users)
-								.set({
-									name: body.name,
-									college: body.college,
-									contact: body.contact,
-									stream: body.stream,
-									year: body.year,
-								})
-								.where(eq(users.email, body.email));
-
-							log.info(`user ${userExists[0].email} was updated`);
-
-							return {
-								message: `updated ${userExists[0].email}`,
-								userid: userExists[0].id,
-							};
-						}
-
-						// login user
-						log.info(`user ${userExists[0].name} logged in`);
-
-						return {
-							message: `welcome back ${userExists[0].name}`,
-							userid: userExists[0].id,
-						};
-					}
-
-					const res = await db
-						.insert(users)
+					const newUser = await db
+						.insert(college_users)
 						.values({
 							id: randomUUID(),
 							...body,
-							workshops: [],
 						})
 						.returning({
-							id: users.id,
-							name: users.name,
-							email: users.email,
+							userid: college_users.id,
+							name: college_users.name,
+							email: college_users.email,
 						});
-					log.info(`new user ${res[0].email} logged in`);
+
+					log.info(`new user ${newUser[0].email} logged in`);
 
 					await sendEmail(
-						res[0].name,
-						res[0].email,
+						newUser[0].name,
+						newUser[0].email,
 						"Welcome To TechFiesta24 🎉",
 						welcome,
 					);
 
 					return {
-						message: `welcome ${body.name}`,
-						userid: res[0].id,
+						message: `Welcome ${newUser[0].name}`,
+						userid: newUser[0].userid,
 					};
 				},
 				{
@@ -119,66 +90,34 @@ export const user = (app: Elysia) =>
 					},
 				},
 			)
-			.post(
-				"/checkemail",
-				async ({ log, body: { email }, set }) => {
-					log.info(`checking if user with email ${email} exists`);
+			.get(
+				"/",
+				async ({ log, set, headers: { email } }) => {
+					log.info(`getting user details for user ${email}`);
 
-					const userExists = await db
-						.select({ id: users.id, name: users.name })
-						.from(users)
-						.where(eq(users.email, email));
+					const userExists = await db.query.college_users.findFirst({
+						where: eq(college_users.email, email),
+						with: {
+							workshop: true,
+							team: true,
+						},
+					});
 
-					if (userExists && userExists.length > 0) {
-						log.info(`user ${email} logged in`);
-						return {
-							message: `welcome back ${userExists[0].name}!`,
-							userid: userExists[0].id,
-						};
+					if (userExists) {
+						log.info(`user ${userExists.email} logged in`);
+
+						return userExists;
 					}
 
-					set.status = 401;
+					log.info(`user ${email} does not exist`);
+
 					return {
-						message: "user does not exist",
+						message: "User does not exist",
 					};
 				},
 				{
-					body: t.Object({
-						email: t.String({
-							format: "email",
-							errror: "invalid email",
-						}),
-					}),
-					detail: {
-						summary: "Check Email",
-						description:
-							"See if the user exists in the database and set a cookie",
-						responses: {
-							200: { description: "Success" },
-							401: { description: "User does not exist" },
-						},
-						tags: ["user"],
-					},
-				},
-			)
-			.get(
-				"/me",
-				async ({ log, set, headers: { userid } }) => {
-					if (!userid) {
-						set.status = 401;
-						throw new Error("user not logged in");
-					}
-
-					log.info(`getting user details for user ${userid}`);
-
-					return await db
-						.select()
-						.from(users)
-						.where(eq(users.id, userid));
-				},
-				{
 					headers: t.Object({
-						userid: t.Optional(t.String()),
+						email: t.String(),
 					}),
 					detail: {
 						summary: "Get user details",

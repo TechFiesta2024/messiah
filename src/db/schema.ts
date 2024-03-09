@@ -1,17 +1,75 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
-export const users = pgTable("users", {
+export const college_users = pgTable("college_users", {
 	id: uuid("id").primaryKey(),
-	createAt: timestamp("create_at").notNull().defaultNow(),
+	createAt: timestamp("create_at", { withTimezone: true })
+		.notNull()
+		.defaultNow(),
 	name: text("name").notNull(),
 	email: text("email").notNull().unique(),
 	college: text("college").notNull(),
 	stream: text("stream").notNull(),
 	contact: text("contact").notNull().unique(),
 	year: text("year").notNull(),
-	workshops: text("workshops").array().notNull(),
-	team: text("team").references(() => teams.id),
+	team_id: text("team_id").references(() => teams.code),
+});
+
+export const college_users_relations = relations(
+	college_users,
+	({ many, one }) => ({
+		workshop: many(workshops),
+		team: one(teams, {
+			fields: [college_users.team_id],
+			references: [teams.code],
+		}),
+	}),
+);
+
+export const workshop_enum = pgEnum("category", [
+	"product_design",
+	"hardware",
+	"cad",
+	"ctf",
+]);
+
+export const workshops = pgTable("workshop", {
+	category: workshop_enum("category").notNull(),
+	user_email: text("user_email")
+		.notNull()
+		.references(() => college_users.email),
+});
+
+export const workshop_relations = relations(workshops, ({ one }) => ({
+	user_email: one(college_users, {
+		fields: [workshops.user_email],
+		references: [college_users.email],
+	}),
+}));
+
+export const teams = pgTable("teams", {
+	name: text("name").notNull(),
+	leader_email: text("leader_email").notNull().unique(),
+	leader_contact: text("leader_contact").notNull().unique(),
+	code: text("code").notNull().unique(),
+});
+
+export const teams_relations = relations(teams, ({ many }) => ({
+	members: many(college_users),
+}));
+
+export const school_users = pgTable("school_users", {
+	id: uuid("id").primaryKey(),
+	createAt: timestamp("create_at", { withTimezone: true })
+		.notNull()
+		.defaultNow(),
+	name: text("name").notNull(),
+	email: text("email").notNull().unique(),
+	school: text("school").notNull(),
+	contact: text("contact").notNull().unique(),
+	class: text("class").notNull(),
+	guardian_contact: text("gardian_contact").notNull(),
+	guardian_name: text("gardian_name").notNull(),
 });
 
 export const communities = pgTable("communities", {
@@ -36,70 +94,21 @@ export const ambassadors = pgTable("ambassadors", {
 	ambassador_linkedin: text("linkedin").notNull(),
 });
 
-export const workshopProduct = pgTable("workshop_product", {
-	name: text("name").notNull(),
-	email: text("email").notNull().primaryKey().unique(),
-	college: text("college").notNull(),
-	stream: text("stream").notNull(),
-	year: text("year").notNull(),
-});
-
-export const workshopCTF = pgTable("workshop_ctf", {
-	name: text("name").notNull(),
-	email: text("email").notNull().primaryKey().unique(),
-	college: text("college").notNull(),
-	stream: text("stream").notNull(),
-	year: text("year").notNull(),
-});
-
-export const workshopHardware = pgTable("workshop_hardware", {
-	name: text("name").notNull(),
-	email: text("email").notNull().primaryKey().unique(),
-	college: text("college").notNull(),
-	stream: text("stream").notNull(),
-	year: text("year").notNull(),
-});
-
-export const workshopCAD = pgTable("workshop_cad", {
-	name: text("name").notNull(),
-	email: text("email").notNull().primaryKey().unique(),
-	college: text("college").notNull(),
-	stream: text("stream").notNull(),
-	year: text("year").notNull(),
-});
-
-export const teams = pgTable("teams", {
-	id: text("id").primaryKey(),
-	name: text("name").notNull(),
-	leader_email: text("leader_email")
-		.references(() => users.email)
-		.notNull(),
-	leader_contact: text("leader_contact")
-		.references(() => users.contact)
-		.notNull(),
-	members: text("members").array().notNull(),
-	events: text("events").array(),
-});
-
-export const usersRelations = relations(users, ({ one }) => ({
-	teams: one(users),
-}));
-
-export const teamsRelations = relations(teams, ({ many, one }) => ({
-	leader_email: one(users, {
-		fields: [teams.leader_email],
-		references: [users.email],
-	}),
-	leader_contact: one(users, {
-		fields: [teams.leader_contact],
-		references: [users.contact],
-	}),
-	members: many(users),
-}));
-
-export const event_uiux = pgTable("event_uiux", {
-	team_name: text("name").notNull(),
-	leader_email: text("email").notNull().unique(),
-	leader_contact: text("contact").notNull().unique(),
-	isPaid: text("isPaid").default("no").notNull(),
-});
+export const event_enum = pgEnum("category", [
+	"creative_writing",
+	"waste_to_art",
+	"extempore",
+	"painting",
+	"ui_ux",
+	"frontend",
+	"ctf",
+	"webathon",
+	"treasure_hunt",
+	"maze_solver",
+	"race",
+	"iot",
+	"circuits",
+	"science_exhibition",
+	"cad",
+	"math",
+]);

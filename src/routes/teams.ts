@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 
 import { db } from "../db";
-import { teams, users } from "../db/schema";
+import { college_users, teams } from "../db/schema";
 import { log } from "../log";
 import { generateRandomString } from "../utils";
 
@@ -27,38 +27,37 @@ export const team = (app: Elysia) =>
 
 					log.info(`getting user details for user ${userid}`);
 
-					const user = await db
-						.select()
-						.from(users)
-						.where(eq(users.id, userid));
+					const user = await db.query.college_users.findFirst({
+						where: eq(college_users.id, userid),
+						with: {
+							team: true,
+						},
+					});
 
-					if (user && user.length > 0) {
-						if (!user[0].team) {
-							const id = generateRandomString(8);
-							const team = await db.insert(teams).values({
-								id,
-								name: body.name,
-								leader_email: user[0].email,
-								leader_contact: user[0].contact,
-								members: [user[0].id],
-								event: [],
-							});
-
-							if (team && team.length > 0) {
-								await db
-									.update(users)
-									.set({ team: id })
-									.where(eq(users.id, user[0].id));
-							}
-
-							log.info(team);
-
-							return `Created team for user ${user[0].name}`;
-						}
+					if (!user) {
+						return "user not found";
+					}
+					if (user.team) {
 						return "user already in a team";
 					}
 
-					return "user not found";
+					const code = generateRandomString(8);
+
+					await db.insert(teams).values({
+						code,
+						leader_email: user.email,
+						leader_contact: user.contact,
+						name: body.name,
+					});
+
+					await db
+						.update(college_users)
+						.set({
+							team_id: code,
+						})
+						.where(eq(college_users.id, userid));
+
+					return `team ${code} created`;
 				},
 				{
 					headers: t.Object({
