@@ -110,10 +110,30 @@ export const user = (app: Elysia) =>
 						guardian_name: t.String(),
 					}),
 					detail: {
-						summary: "Register as school user",
+						summary: "Register/Update/Login a school user",
+						description: "Register and update a school",
 						responses: {
-							200: { description: "Success" },
-							500: { description: "Internal server error" },
+							200: {
+								description: "Success",
+								content: {
+									"application/json": {
+										schema: t.Object({
+											message: t.String(),
+											userid: t.String(),
+										}),
+									},
+								},
+							},
+							500: {
+								description: "Internal server error",
+								content: {
+									"application/json": {
+										schema: t.Object({
+											message: t.String(),
+										}),
+									},
+								},
+							},
 						},
 						tags: ["user"],
 					},
@@ -203,11 +223,30 @@ export const user = (app: Elysia) =>
 						year: t.String(),
 					}),
 					detail: {
-						summary: "Register as a user",
-						description: "Register as a user and get a cookie",
+						summary: "Register/Update/Login a college user",
+						description: "Register and update a college",
 						responses: {
-							200: { description: "Success" },
-							500: { description: "Internal server error" },
+							200: {
+								description: "Success",
+								content: {
+									"application/json": {
+										schema: t.Object({
+											message: t.String(),
+											userid: t.String(),
+										}),
+									},
+								},
+							},
+							500: {
+								description: "Internal server error",
+								content: {
+									"application/json": {
+										schema: t.Object({
+											message: t.String(),
+										}),
+									},
+								},
+							},
 						},
 						tags: ["user"],
 					},
@@ -268,7 +307,18 @@ export const user = (app: Elysia) =>
 						summary: "Get user details",
 						description: "Get the details of the logged in user",
 						responses: {
-							200: { description: "Success" },
+							200: {
+								description: "Success",
+								content: {
+									"application/json": {
+										schema: t.Object({
+											type: t.String(),
+											college_users: t.Object({}),
+											school_users: t.Object({}),
+										}),
+									},
+								},
+							},
 							401: { description: "User not logged in" },
 							500: { description: "Internal server error" },
 						},
