@@ -5,7 +5,7 @@ import { Elysia, t } from "elysia";
 import { db } from "../db";
 import { college_users, school_users } from "../db/schema";
 import { sendEmail } from "../email";
-import { welcome } from "../emails/welcome";
+import { renderWelcomeEmail } from "../emails/welcome";
 import { log } from "../log";
 
 export const user = (app: Elysia) =>
@@ -80,7 +80,7 @@ export const user = (app: Elysia) =>
 						newUser[0].name,
 						newUser[0].email,
 						"Welcome To TechFiesta24 🎉",
-						welcome,
+						renderWelcomeEmail,
 					);
 
 					return {
@@ -198,7 +198,7 @@ export const user = (app: Elysia) =>
 						newUser[0].name,
 						newUser[0].email,
 						"Welcome To TechFiesta24 🎉",
-						welcome,
+						renderWelcomeEmail,
 					);
 
 					return {
