@@ -7,7 +7,7 @@ import { log } from "../log";
 import { generateRandomString } from "../utils";
 
 export const team = (app: Elysia) =>
-	app.group("/team", (app) =>
+	app.group("/team", { detail: { tags: ["team"] } }, (app) =>
 		app
 			.use(log)
 			.onError((ctx) => {
@@ -65,6 +65,14 @@ export const team = (app: Elysia) =>
 					body: t.Object({
 						name: t.String(),
 					}),
+					detail: {
+						summary: "Create a team",
+						description: "Create a team and join it as a leader",
+						responses: {
+							200: { description: "Team created successfully" },
+							500: { description: "Internal server error" },
+						},
+					},
 				},
 			)
 			.post(
@@ -112,6 +120,14 @@ export const team = (app: Elysia) =>
 					headers: t.Object({
 						userid: t.Optional(t.String()),
 					}),
+					detail: {
+						summary: "Join a team",
+						description: "Join a team as a member",
+						responses: {
+							200: { description: "Team joined successfully" },
+							500: { description: "Internal server error" },
+						},
+					},
 				},
 			)
 			.post(
@@ -164,6 +180,14 @@ export const team = (app: Elysia) =>
 						userid: t.Optional(t.String()),
 						teamid: t.Optional(t.String()),
 					}),
+					detail: {
+						summary: "Leave a team",
+						description: "Leave a team",
+						responses: {
+							200: { description: "Team left successfully" },
+							500: { description: "Internal server error" },
+						},
+					},
 				},
 			)
 			.post(
@@ -196,6 +220,14 @@ export const team = (app: Elysia) =>
 				{
 					params: t.Object({ id: t.String() }),
 					headers: t.Object({ userid: t.Optional(t.String()) }),
+					detail: {
+						summary: "Delete a team",
+						description: "Delete a team",
+						responses: {
+							200: { description: "Team deleted successfully" },
+							500: { description: "Internal server error" },
+						},
+					},
 				},
 			),
 	);

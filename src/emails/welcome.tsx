@@ -16,58 +16,7 @@ import { render } from "@react-email/render";
 import { Tailwind } from "@react-email/tailwind";
 import * as React from "react";
 
-interface NetlifyWelcomeEmailProps {
-	steps?: {
-		id: number;
-		Description: React.ReactNode;
-	}[];
-	links?: string[];
-}
-
-const PropDefaults: NetlifyWelcomeEmailProps = {
-	steps: [
-		{
-			id: 1,
-			Description: (
-				<li className="mb-20" key={1}>
-					<strong>What to Expect:</strong> Techfiesta24 promises to be
-					a day packed with innovation, learning, and networking.
-					Whether you're a seasoned tech enthusiast or just starting
-					your journey, our event has something for everyone. Engage
-					with industry experts, participate in hands-on workshops,
-					and explore the latest in technology trends.{" "}
-				</li>
-			),
-		},
-		{
-			id: 2,
-			Description: (
-				<li className="mb-20" key={2}>
-					<strong>Connect with Us:</strong> Stay connected with us on
-					social media to receive real-time updates, sneak peeks, and
-					exclusive content leading up to the event. Follow us on
-					[Social Media Handles] to join the conversation and connect
-					with fellow participants.{" "}
-				</li>
-			),
-		},
-		{
-			id: 3,
-			Description: (
-				<li className="mb-20" key={3}>
-					<strong>Any Questions?</strong> If you have any questions or
-					require additional information, feel free to reach out to
-					our dedicated support team at{" "}
-					<Link>contact@aotfiesta24.tech</Link>.{" "}
-				</li>
-			),
-		},
-	],
-};
-
-export const NetlifyWelcomeEmail = ({
-	steps = PropDefaults.steps,
-}: NetlifyWelcomeEmailProps) => {
+export const WelcomeEmail = () => {
 	return (
 		<Html>
 			<Head />
@@ -96,9 +45,9 @@ export const NetlifyWelcomeEmail = ({
 			>
 				<Body className="bg-black text-base font-sans">
 					<Img
-						src="https://storage-techfiesta24.blr1.cdn.digitaloceanspaces.com/logo_main.png"
-						width="200"
-						height="200"
+						src="https://storage-techfiesta24.blr1.cdn.digitaloceanspaces.com/Vector.svg"
+						width="100"
+						height="100"
 						alt="Techfiesta24"
 						className="mx-auto my-20"
 					/>
@@ -106,6 +55,8 @@ export const NetlifyWelcomeEmail = ({
 						<Heading className="text-center my-0 leading-8">
 							Welcome&nbsp; to &nbsp;
 							<span className="text-red">Techfiesta24</span>
+							<br />
+							&amp; Humatronics
 						</Heading>
 
 						<Section>
@@ -120,7 +71,31 @@ export const NetlifyWelcomeEmail = ({
 							</Row>
 						</Section>
 
-						<ul>{steps?.map(({ Description }) => Description)}</ul>
+						<ul>
+							<li key="1" className="mb-20">
+								<strong>What to Expect:</strong> Techfiesta24
+								promises to be a day packed with innovation,
+								learning, and networking. Whether you're a
+								seasoned tech enthusiast or just starting your
+								journey, our event has something for everyone.
+								Engage with industry experts, participate in
+								hands-on workshops, and explore the latest in
+								technology trends.
+							</li>
+							<li key="2" className="mb-20">
+								<strong>Connect with Us:</strong> Stay connected
+								with us on social media to receive real-time
+								updates, sneak peeks, and exclusive content
+								leading up to the event. Follow us on [Social
+								Media Handles] to join the conversation and
+							</li>
+							<li key="3" className="mb-20">
+								<strong>Any Questions?</strong> If you have any
+								questions or require additional information,
+								feel free to reach out to our dedicated support
+								team at <Link>contact@aotfiesta24.tech</Link>.
+							</li>
+						</ul>
 
 						<Section className="text-center">
 							<Button className="bg-white text-black rounded-lg py-3 px-[18px]">
@@ -141,4 +116,5 @@ export const NetlifyWelcomeEmail = ({
 	);
 };
 
-export const welcome = render(<NetlifyWelcomeEmail />);
+export const renderWelcomeEmail = render(<WelcomeEmail />);
+export default WelcomeEmail;

@@ -5,11 +5,11 @@ import { Elysia, t } from "elysia";
 import { db } from "../db";
 import { college_users, school_users } from "../db/schema";
 import { sendEmail } from "../email";
-import { welcome } from "../emails/welcome";
+import { renderWelcomeEmail } from "../emails/welcome";
 import { log } from "../log";
 
 export const user = (app: Elysia) =>
-	app.group("/user", (app) =>
+	app.group("/user", { detail: { tags: ["user"] } }, (app) =>
 		app
 			.use(log)
 			.onError((ctx) => {
@@ -80,7 +80,7 @@ export const user = (app: Elysia) =>
 						newUser[0].name,
 						newUser[0].email,
 						"Welcome To TechFiesta24 🎉",
-						welcome,
+						renderWelcomeEmail,
 					);
 
 					return {
@@ -135,7 +135,6 @@ export const user = (app: Elysia) =>
 								},
 							},
 						},
-						tags: ["user"],
 					},
 				},
 			)
@@ -198,7 +197,7 @@ export const user = (app: Elysia) =>
 						newUser[0].name,
 						newUser[0].email,
 						"Welcome To TechFiesta24 🎉",
-						welcome,
+						renderWelcomeEmail,
 					);
 
 					return {
@@ -248,7 +247,6 @@ export const user = (app: Elysia) =>
 								},
 							},
 						},
-						tags: ["user"],
 					},
 				},
 			)
@@ -323,7 +321,6 @@ export const user = (app: Elysia) =>
 							401: { description: "User not logged in" },
 							500: { description: "Internal server error" },
 						},
-						tags: ["user"],
 					},
 				},
 			),
