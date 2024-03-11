@@ -7,7 +7,7 @@ export const sendEmail = async (
 	if (process.env.NODE_ENV !== "production") {
 		console.log("Email sent in development mode");
 		console.log(
-			`To: ${toName} <${toEmail}>\nFrom: TechFiesta Team <${process.env.EMAIL}>\nSubject: ${subject}\nBody: ${email_body}`,
+			`To: ${toName} <${toEmail}>\nFrom: TechFiesta Team <${process.env.EMAIL}>\nSubject: ${subject}`,
 		);
 		return "Email sent successfully!";
 	}

@@ -20,32 +20,6 @@ const db = drizzle(pool);
 			migrationsFolder: "migrations",
 		});
 
-		await pool`
-    CREATE OR REPLACE FUNCTION enforce_unique_elements()
-    RETURNS TRIGGER AS $$
-    BEGIN
-      IF (
-        SELECT COUNT(DISTINCT element)
-        FROM unnest(NEW.workshops) element
-      ) <> cardinality(NEW.workshops)
-      THEN
-        RAISE EXCEPTION 'you have already joined this workshop';
-      END IF;
-      RETURN NEW;
-    END;
-    $$ LANGUAGE plpgsql`.execute();
-
-		console.log("created function successfully");
-
-		await pool`
-	   CREATE OR REPLACE TRIGGER check_unique_elements
-	   BEFORE INSERT OR UPDATE
-	   ON users
-	   FOR EACH ROW
-	   EXECUTE FUNCTION enforce_unique_elements()`.execute();
-
-		console.log("created trigger successfully");
-
 		console.log("migrations ran successfully");
 
 		pool.end();

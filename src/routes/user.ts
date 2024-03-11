@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 
 import { db } from "../db";
-import { users } from "../db/schema";
+import { college_users, school_users } from "../db/schema";
 import { sendEmail } from "../email";
 import { welcome } from "../emails/welcome";
 import { log } from "../log";
@@ -20,76 +20,190 @@ export const user = (app: Elysia) =>
 				};
 			})
 			.post(
-				"/login",
+				"/school",
 				async ({ log, body }) => {
-					log.info(body);
+					log.info(`/user/school : ${body.email}`);
 
-					const userExists = await db
-						.select()
-						.from(users)
-						.where(eq(users.email, body.email));
+					const userExists = await db.query.school_users.findFirst({
+						where: eq(school_users.email, body.email),
+					});
 
-					if (userExists && userExists.length > 0) {
-						// compare the body with the user and update the user
+					if (userExists) {
+						// compare the body with the userExists
 						if (
-							userExists[0].name !== body.name ||
-							userExists[0].college !== body.college ||
-							userExists[0].contact !== body.contact ||
-							userExists[0].stream !== body.stream ||
-							userExists[0].year !== body.year
+							userExists.name !== body.name ||
+							userExists.contact !== body.contact ||
+							userExists.school !== body.school ||
+							userExists.class !== body.class ||
+							userExists.guardian_contact !==
+								body.guardian_contact ||
+							userExists.guardian_name !== body.guardian_name
 						) {
 							await db
-								.update(users)
+								.update(school_users)
 								.set({
-									name: body.name,
-									college: body.college,
-									contact: body.contact,
-									stream: body.stream,
-									year: body.year,
+									...body,
 								})
-								.where(eq(users.email, body.email));
+								.where(eq(school_users.email, body.email));
 
-							log.info(`user ${userExists[0].email} was updated`);
+							log.info(`user ${userExists.email} updated`);
 
 							return {
-								message: `updated ${userExists[0].email}`,
-								userid: userExists[0].id,
+								message: "Successfully updated",
+								userid: userExists.id,
 							};
 						}
 
-						// login user
-						log.info(`user ${userExists[0].name} logged in`);
+						log.info(`user ${userExists.email} logged in`);
 
 						return {
-							message: `welcome back ${userExists[0].name}`,
-							userid: userExists[0].id,
+							message: `Welcome back ${userExists.name}`,
+							userid: userExists.id,
 						};
 					}
 
-					const res = await db
-						.insert(users)
+					const newUser = await db
+						.insert(school_users)
 						.values({
 							id: randomUUID(),
 							...body,
-							workshops: [],
 						})
 						.returning({
-							id: users.id,
-							name: users.name,
-							email: users.email,
+							userid: school_users.id,
+							name: school_users.name,
+							email: school_users.email,
 						});
-					log.info(`new user ${res[0].email} logged in`);
+
+					log.info(`new user ${newUser[0].email} logged in`);
 
 					await sendEmail(
-						res[0].name,
-						res[0].email,
+						newUser[0].name,
+						newUser[0].email,
 						"Welcome To TechFiesta24 🎉",
 						welcome,
 					);
 
 					return {
-						message: `welcome ${body.name}`,
-						userid: res[0].id,
+						message: `Welcome ${newUser[0].name}`,
+						userid: newUser[0].userid,
+					};
+				},
+				{
+					body: t.Object({
+						name: t.String(),
+						email: t.String({
+							format: "email",
+							errror: "invalid email",
+						}),
+						school: t.String(),
+						contact: t.String({
+							maxLength: 10,
+							minLength: 10,
+							error: "invalid contact number",
+						}),
+						class: t.String(),
+						guardian_contact: t.String({
+							maxLength: 10,
+							minLength: 10,
+							error: "invalid contact number",
+						}),
+						guardian_name: t.String(),
+					}),
+					detail: {
+						summary: "Register/Update/Login a school user",
+						description: "Register and update a school",
+						responses: {
+							200: {
+								description: "Success",
+								content: {
+									"application/json": {
+										schema: t.Object({
+											message: t.String(),
+											userid: t.String(),
+										}),
+									},
+								},
+							},
+							500: {
+								description: "Internal server error",
+								content: {
+									"application/json": {
+										schema: t.Object({
+											message: t.String(),
+										}),
+									},
+								},
+							},
+						},
+						tags: ["user"],
+					},
+				},
+			)
+			.post(
+				"/college",
+				async ({ log, body }) => {
+					log.info(`/user/college : ${body.email}`);
+
+					const userExists = await db.query.college_users.findFirst({
+						where: eq(college_users.email, body.email),
+					});
+
+					if (userExists) {
+						// compare the body with the userExists
+						if (
+							userExists.name !== body.name ||
+							userExists.contact !== body.contact ||
+							userExists.college !== body.college ||
+							userExists.stream !== body.stream ||
+							userExists.year !== body.year
+						) {
+							await db
+								.update(college_users)
+								.set({
+									...body,
+								})
+								.where(eq(college_users.email, body.email));
+
+							log.info(`user ${userExists.email} updated`);
+
+							return {
+								message: "Successfully updated",
+								userid: userExists.id,
+							};
+						}
+
+						log.info(`user ${userExists.email} logged in`);
+
+						return {
+							message: `Welcome back ${userExists.name}`,
+							userid: userExists.id,
+						};
+					}
+
+					const newUser = await db
+						.insert(college_users)
+						.values({
+							id: randomUUID(),
+							...body,
+						})
+						.returning({
+							userid: college_users.id,
+							name: college_users.name,
+							email: college_users.email,
+						});
+
+					log.info(`new user ${newUser[0].email} logged in`);
+
+					await sendEmail(
+						newUser[0].name,
+						newUser[0].email,
+						"Welcome To TechFiesta24 🎉",
+						welcome,
+					);
+
+					return {
+						message: `Welcome ${newUser[0].name}`,
+						userid: newUser[0].userid,
 					};
 				},
 				{
@@ -109,82 +223,103 @@ export const user = (app: Elysia) =>
 						year: t.String(),
 					}),
 					detail: {
-						summary: "Register as a user",
-						description: "Register as a user and get a cookie",
+						summary: "Register/Update/Login a college user",
+						description: "Register and update a college",
 						responses: {
-							200: { description: "Success" },
-							500: { description: "Internal server error" },
-						},
-						tags: ["user"],
-					},
-				},
-			)
-			.post(
-				"/checkemail",
-				async ({ log, body: { email }, set }) => {
-					log.info(`checking if user with email ${email} exists`);
-
-					const userExists = await db
-						.select({ id: users.id, name: users.name })
-						.from(users)
-						.where(eq(users.email, email));
-
-					if (userExists && userExists.length > 0) {
-						log.info(`user ${email} logged in`);
-						return {
-							message: `welcome back ${userExists[0].name}!`,
-							userid: userExists[0].id,
-						};
-					}
-
-					set.status = 401;
-					return {
-						message: "user does not exist",
-					};
-				},
-				{
-					body: t.Object({
-						email: t.String({
-							format: "email",
-							errror: "invalid email",
-						}),
-					}),
-					detail: {
-						summary: "Check Email",
-						description:
-							"See if the user exists in the database and set a cookie",
-						responses: {
-							200: { description: "Success" },
-							401: { description: "User does not exist" },
+							200: {
+								description: "Success",
+								content: {
+									"application/json": {
+										schema: t.Object({
+											message: t.String(),
+											userid: t.String(),
+										}),
+									},
+								},
+							},
+							500: {
+								description: "Internal server error",
+								content: {
+									"application/json": {
+										schema: t.Object({
+											message: t.String(),
+										}),
+									},
+								},
+							},
 						},
 						tags: ["user"],
 					},
 				},
 			)
 			.get(
-				"/me",
-				async ({ log, set, headers: { userid } }) => {
-					if (!userid) {
-						set.status = 401;
-						throw new Error("user not logged in");
+				"/",
+				async ({ log, set, headers: { email } }) => {
+					log.info(`getting user details for user ${email}`);
+
+					const collegeUsers = await db.query.college_users.findFirst(
+						{
+							where: eq(college_users.email, email),
+							with: {
+								workshop: true,
+								team: true,
+								event: true,
+							},
+						},
+					);
+
+					if (collegeUsers) {
+						log.info(
+							`college user ${collegeUsers.email} logged in`,
+						);
+
+						return {
+							type: "college",
+							...collegeUsers,
+						};
+					}
+					const schoolUsers = await db.query.school_users.findFirst({
+						where: eq(school_users.email, email),
+						with: {
+							event: true,
+						},
+					});
+
+					if (schoolUsers) {
+						log.info(`school user ${schoolUsers.email} logged in`);
+
+						return {
+							type: "school",
+							...schoolUsers,
+						};
 					}
 
-					log.info(`getting user details for user ${userid}`);
+					log.info(`user ${email} does not exist`);
 
-					return await db
-						.select()
-						.from(users)
-						.where(eq(users.id, userid));
+					return {
+						message: "User does not exist",
+					};
 				},
 				{
 					headers: t.Object({
-						userid: t.Optional(t.String()),
+						email: t.String(),
 					}),
 					detail: {
 						summary: "Get user details",
 						description: "Get the details of the logged in user",
 						responses: {
-							200: { description: "Success" },
+							200: {
+								description: "Success",
+								content: {
+									"application/json": {
+										schema: t.Object({
+											type: t.String(),
+											college_users: t.Object({}),
+											school_users: t.Object({}),
+										}),
+									},
+								},
+							},
 							401: { description: "User not logged in" },
 							500: { description: "Internal server error" },
 						},

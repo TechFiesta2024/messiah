@@ -7,14 +7,26 @@ import { sendEmail } from "../email";
 import { log } from "../log";
 
 enum category {
-	product_design = "product_design",
-	hardware = "hardware",
-	cad = "cad",
+	creative_writing = "creative_writing",
+	waste_to_art = "waste_to_art",
+	extempore = "extempore",
+	painting = "painting",
+	ui_ux = "ui_ux",
+	frontend = "frontend",
 	ctf = "ctf",
+	webathon = "webathon",
+	treasure_hunt = "treasure_hunt",
+	maze_solver = "maze_solver",
+	race = "race",
+	iot = "iot",
+	circuits = "circuits",
+	science_exhibition = "science_exhibition",
+	cad = "cad",
+	math = "math",
 }
 
-export const workshop = (app: Elysia) =>
-	app.group("/workshop", (app) =>
+export const events = (app: Elysia) =>
+	app.group("/event", (app) =>
 		app
 			.use(log)
 			.onError((ctx) => {
@@ -26,7 +38,7 @@ export const workshop = (app: Elysia) =>
 			.post(
 				"/join/:id",
 				async ({ set, log, headers: { userid }, params: { id } }) => {
-					log.info(`/workshop/join : ${id}`);
+					log.info(`/event/join/${id}`);
 					if (!userid) {
 						set.status = 401;
 						throw new Error("user not logged in");
@@ -35,7 +47,8 @@ export const workshop = (app: Elysia) =>
 					const user = await db.query.college_users.findFirst({
 						where: eq(college_users.id, userid),
 						with: {
-							workshop: true,
+							team: true,
+							event: true,
 						},
 					});
 
@@ -44,16 +57,9 @@ export const workshop = (app: Elysia) =>
 						throw new Error("user not found");
 					}
 
-					if (user.workshop.some((obj) => obj.category === id)) {
-						return {
-							message: "Already joined",
-						};
-					}
-
-					await db.insert(workshops).values({
-						category: id as category,
-						user_email: user.email,
-					});
+					// solo events
+					// teamd events
+					// school events
 
 					return {
 						message: "Successfully joined",
@@ -67,9 +73,9 @@ export const workshop = (app: Elysia) =>
 						userid: t.Optional(t.String()),
 					}),
 					detail: {
-						summary: "Join a workshop",
+						summary: "Register for an event",
 						description:
-							"Join a workshop by providing the id of the workshop",
+							"Register for an event. User must be logged in to register for an event",
 						parameters: [
 							{
 								name: "id",
@@ -77,7 +83,7 @@ export const workshop = (app: Elysia) =>
 								schema: { type: "string" },
 								required: true,
 								description:
-									"product_design | hardware | cad | ctf",
+									"creative_writing | waste_to_art extempore | painting | ui_ux | frontend | ctf |	webathon | treasure_hunt | maze_solver | race | iot |circuits |science_exhibition |cad | math",
 							},
 						],
 						responses: {
@@ -101,7 +107,7 @@ export const workshop = (app: Elysia) =>
 							401: { description: "User not logged in" },
 							500: { description: "Internal server error" },
 						},
-						tags: ["workshop"],
+						tags: ["event"],
 					},
 				},
 			),
