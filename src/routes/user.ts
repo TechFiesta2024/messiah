@@ -263,6 +263,7 @@ export const user = (app: Elysia) =>
 							with: {
 								workshop: true,
 								team: true,
+								event: true,
 							},
 						},
 					);
@@ -280,7 +281,7 @@ export const user = (app: Elysia) =>
 					const schoolUsers = await db.query.school_users.findFirst({
 						where: eq(school_users.email, email),
 						with: {
-							team: true,
+							event: true,
 						},
 					});
 

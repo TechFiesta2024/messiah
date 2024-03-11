@@ -23,6 +23,7 @@ export const college_users_relations = relations(
 			fields: [college_users.team_id],
 			references: [teams.code],
 		}),
+		event: many(events),
 	}),
 );
 
@@ -56,6 +57,55 @@ export const teams = pgTable("teams", {
 
 export const teams_relations = relations(teams, ({ many }) => ({
 	members: many(college_users),
+	event: many(events),
+}));
+
+export const event_enum = pgEnum("category", [
+	"creative_writing",
+	"waste_to_art",
+	"extempore",
+	"painting",
+	"ui_ux",
+	"frontend",
+	"ctf",
+	"webathon",
+	"treasure_hunt",
+	"maze_solver",
+	"race",
+	"iot",
+	"circuits",
+	"science_exhibition",
+	"cad",
+	"math",
+]);
+
+export const events = pgTable("events", {
+	category: event_enum("category").notNull(),
+	team_id: text("team_id")
+		.unique()
+		.references(() => teams.code),
+	college_user_id: uuid("college_user_id")
+		.unique()
+		.references(() => college_users.id),
+	school_user_id: uuid("school_user_id")
+		.unique()
+		.references(() => school_users.id),
+	payment_status: text("payment_status").default("not_paid").notNull(),
+});
+
+export const events_relations = relations(events, ({ one }) => ({
+	college_user: one(college_users, {
+		fields: [events.college_user_id],
+		references: [college_users.id],
+	}),
+	college_team: one(teams, {
+		fields: [events.team_id],
+		references: [teams.code],
+	}),
+	school_user: one(school_users, {
+		fields: [events.school_user_id],
+		references: [school_users.id],
+	}),
 }));
 
 export const school_users = pgTable("school_users", {
@@ -71,6 +121,10 @@ export const school_users = pgTable("school_users", {
 	guardian_contact: text("gardian_contact").notNull(),
 	guardian_name: text("gardian_name").notNull(),
 });
+
+export const school_users_relations = relations(school_users, ({ many }) => ({
+	event: many(events),
+}));
 
 export const communities = pgTable("communities", {
 	id: uuid("id").primaryKey(),
@@ -93,22 +147,3 @@ export const ambassadors = pgTable("ambassadors", {
 	ambassador_description: text("description").notNull(),
 	ambassador_linkedin: text("linkedin").notNull(),
 });
-
-export const event_enum = pgEnum("category", [
-	"creative_writing",
-	"waste_to_art",
-	"extempore",
-	"painting",
-	"ui_ux",
-	"frontend",
-	"ctf",
-	"webathon",
-	"treasure_hunt",
-	"maze_solver",
-	"race",
-	"iot",
-	"circuits",
-	"science_exhibition",
-	"cad",
-	"math",
-]);
