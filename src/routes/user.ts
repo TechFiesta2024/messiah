@@ -9,7 +9,7 @@ import { renderWelcomeEmail } from "../emails/welcome";
 import { log } from "../log";
 
 export const user = (app: Elysia) =>
-	app.group("/user", (app) =>
+	app.group("/user", { detail: { tags: ["user"] } }, (app) =>
 		app
 			.use(log)
 			.onError((ctx) => {
@@ -135,7 +135,6 @@ export const user = (app: Elysia) =>
 								},
 							},
 						},
-						tags: ["user"],
 					},
 				},
 			)
@@ -248,7 +247,6 @@ export const user = (app: Elysia) =>
 								},
 							},
 						},
-						tags: ["user"],
 					},
 				},
 			)
@@ -323,7 +321,6 @@ export const user = (app: Elysia) =>
 							401: { description: "User not logged in" },
 							500: { description: "Internal server error" },
 						},
-						tags: ["user"],
 					},
 				},
 			),
