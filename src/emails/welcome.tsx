@@ -105,8 +105,6 @@ function WelcomeEmail() {
 	);
 }
 
-export const WelcomeEmailHtml = () => {
-	render(<WelcomeEmail />, {
-		pretty: true,
-	});
-};
+export const WelcomeEmailHtml = render(<WelcomeEmail />, {
+	pretty: true,
+});

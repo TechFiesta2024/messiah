@@ -5,6 +5,7 @@ import { Elysia, t } from "elysia";
 import { db } from "../db";
 import { college_users, school_users } from "../db/schema";
 import { sendEmail } from "../email";
+import { WelcomeEmailHtml } from "../emails/welcome";
 import { log } from "../log";
 
 export const user = (app: Elysia) =>
@@ -49,7 +50,7 @@ export const user = (app: Elysia) =>
 
 							return {
 								message: "Successfully updated",
-								userid: userExists.id,
+								id: userExists.id,
 							};
 						}
 
@@ -57,7 +58,7 @@ export const user = (app: Elysia) =>
 
 						return {
 							message: `Welcome back ${userExists.name}`,
-							userid: userExists.id,
+							id: userExists.id,
 						};
 					}
 
@@ -79,12 +80,12 @@ export const user = (app: Elysia) =>
 						newUser[0].name,
 						newUser[0].email,
 						"Welcome To TechFiesta24 🎉",
-						renderWelcomeEmail,
+						WelcomeEmailHtml,
 					);
 
 					return {
 						message: `Welcome ${newUser[0].name}`,
-						userid: newUser[0].userid,
+						id: newUser[0].userid,
 					};
 				},
 				{
@@ -118,7 +119,7 @@ export const user = (app: Elysia) =>
 									"application/json": {
 										schema: t.Object({
 											message: t.String(),
-											userid: t.String(),
+											id: t.String(),
 										}),
 									},
 								},
@@ -166,7 +167,7 @@ export const user = (app: Elysia) =>
 
 							return {
 								message: "Successfully updated",
-								userid: userExists.id,
+								id: userExists.id,
 							};
 						}
 
@@ -174,7 +175,7 @@ export const user = (app: Elysia) =>
 
 						return {
 							message: `Welcome back ${userExists.name}`,
-							userid: userExists.id,
+							id: userExists.id,
 						};
 					}
 
@@ -196,12 +197,12 @@ export const user = (app: Elysia) =>
 						newUser[0].name,
 						newUser[0].email,
 						"Welcome To TechFiesta24 🎉",
-						renderWelcomeEmail,
+						WelcomeEmailHtml,
 					);
 
 					return {
 						message: `Welcome ${newUser[0].name}`,
-						userid: newUser[0].userid,
+						id: newUser[0].userid,
 					};
 				},
 				{
@@ -230,7 +231,7 @@ export const user = (app: Elysia) =>
 									"application/json": {
 										schema: t.Object({
 											message: t.String(),
-											userid: t.String(),
+											id: t.String(),
 										}),
 									},
 								},
