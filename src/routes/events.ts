@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 
 import { db } from "../db";
-import { college_users, school_users, events, teams } from "../db/schema";
+import { events, college_users, school_users, teams } from "../db/schema";
 import { sendEmail } from "../email";
 import { log } from "../log";
 
