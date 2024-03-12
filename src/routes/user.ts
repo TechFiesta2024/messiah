@@ -294,6 +294,8 @@ export const user = (app: Elysia) =>
 
 					log.info(`user ${email} does not exist`);
 
+					set.status = 403;
+
 					return {
 						message: "User does not exist",
 					};
