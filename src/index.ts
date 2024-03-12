@@ -16,7 +16,7 @@ const app = new Elysia()
 			documentation: {
 				info: {
 					title: "messiah",
-					version: "0.3.0",
+					version: "0.9.0",
 				},
 			},
 		}),
