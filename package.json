@@ -5,7 +5,7 @@
     "db:generate": "drizzle-kit generate:pg --schema ./src/db/schema.ts --out=./migrations",
     "db:migrate": "bun run ./src/db/migrate.ts",
     "dev": "bun run --watch src/index.ts",
-    "email:dev": "email dev",
+    "email:dev": "cd src && email dev",
     "format": "biome check src --apply"
   },
   "dependencies": {

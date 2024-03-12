@@ -5,7 +5,6 @@ import { Elysia, t } from "elysia";
 import { db } from "../db";
 import { college_users, school_users } from "../db/schema";
 import { sendEmail } from "../email";
-import { renderWelcomeEmail } from "../emails/welcome";
 import { log } from "../log";
 
 export const user = (app: Elysia) =>

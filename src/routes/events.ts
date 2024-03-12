@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 
 import { db } from "../db";
-import { college_users, workshops } from "../db/schema";
+import { events, college_users, school_users, teams } from "../db/schema";
 import { sendEmail } from "../email";
 import { log } from "../log";
 
@@ -25,7 +25,7 @@ enum category {
 	math = "math",
 }
 
-export const events = (app: Elysia) =>
+export const event = (app: Elysia) =>
 	app.group("/event", (app) =>
 		app
 			.use(log)
@@ -58,7 +58,7 @@ export const events = (app: Elysia) =>
 					}
 
 					// solo events
-					// teamd events
+					// team events
 					// school events
 
 					return {

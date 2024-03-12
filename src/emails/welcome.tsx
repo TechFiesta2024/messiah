@@ -10,17 +10,17 @@ import {
 	Preview,
 	Row,
 	Section,
+	Tailwind,
 	Text,
 } from "@react-email/components";
 import { render } from "@react-email/render";
-import { Tailwind } from "@react-email/tailwind";
 import * as React from "react";
 
-export const WelcomeEmail = () => {
+function WelcomeEmail() {
 	return (
 		<Html>
 			<Head />
-			<Preview>Welcome To Techfiesta24</Preview>
+			<Preview>Welcome To TechFiesta24🎉</Preview>
 			<Tailwind
 				config={{
 					theme: {
@@ -28,16 +28,6 @@ export const WelcomeEmail = () => {
 							colors: {
 								black: "#010100",
 								red: "#FF002B",
-								redfaded: "#DD6D71",
-								yellowish: "#FEFAE0",
-								white: "#FFFFFF",
-								grey: "#ACACAC",
-								yellowish28: "rgba(254,250,224,28%)",
-							},
-							spacing: {
-								0: "0px",
-								20: "20px",
-								45: "45px",
 							},
 						},
 					},
@@ -45,11 +35,11 @@ export const WelcomeEmail = () => {
 			>
 				<Body className="bg-black text-base font-sans">
 					<Img
-						src="https://storage-techfiesta24.blr1.cdn.digitaloceanspaces.com/Vector.svg"
-						width="100"
-						height="100"
-						alt="Techfiesta24"
-						className="mx-auto my-20"
+						src="https://storage-techfiesta24.blr1.cdn.digitaloceanspaces.com/logo_main.png"
+						width="150"
+						height="150"
+						alt="TechFiesta24"
+						className="mx-auto"
 					/>
 					<Container className="bg-black text-white p-45">
 						<Heading className="text-center my-0 leading-8">
@@ -72,31 +62,30 @@ export const WelcomeEmail = () => {
 						</Section>
 
 						<ul>
-							<li key="1" className="mb-20">
+							<li>
 								<strong>What to Expect:</strong> Techfiesta24
 								promises to be a day packed with innovation,
 								learning, and networking. Whether you're a
 								seasoned tech enthusiast or just starting your
 								journey, our event has something for everyone.
 								Engage with industry experts, participate in
-								hands-on workshops, and explore the latest in
+								hands-on workshops, and explore the test in
 								technology trends.
 							</li>
-							<li key="2" className="mb-20">
+							<li>
 								<strong>Connect with Us:</strong> Stay connected
 								with us on social media to receive real-time
 								updates, sneak peeks, and exclusive content
 								leading up to the event. Follow us on [Social
 								Media Handles] to join the conversation and
 							</li>
-							<li key="3" className="mb-20">
+							<li>
 								<strong>Any Questions?</strong> If you have any
 								questions or require additional information,
 								feel free to reach out to our dedicated support
 								team at <Link>contact@aotfiesta24.tech</Link>.
 							</li>
 						</ul>
-
 						<Section className="text-center">
 							<Button className="bg-white text-black rounded-lg py-3 px-[18px]">
 								Go to your dashboard
@@ -114,7 +103,10 @@ export const WelcomeEmail = () => {
 			</Tailwind>
 		</Html>
 	);
-};
+}
 
-export const renderWelcomeEmail = render(<WelcomeEmail />);
-export default WelcomeEmail;
+export const WelcomeEmailHtml = () => {
+	render(<WelcomeEmail />, {
+		pretty: true,
+	});
+};
