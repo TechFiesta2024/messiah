@@ -19,11 +19,6 @@ export const team = (app: Elysia) =>
 			.post(
 				"/create",
 				async ({ set, log, headers: { userid }, body }) => {
-					if (!userid) {
-						set.status = 401;
-						throw new Error("User not logged in");
-					}
-
 					log.info(`getting user details for user ${userid}`);
 
 					const user = await db.query.college_users.findFirst({
@@ -34,10 +29,12 @@ export const team = (app: Elysia) =>
 					});
 
 					if (!user) {
-						return "user not found";
+						set.status = 404;
+						return "User not found";
 					}
 					if (user.team) {
-						return "user already in a team";
+						set.status = 400;
+						return "User already in a team";
 					}
 
 					const code = generateRandomString(8);
@@ -56,14 +53,22 @@ export const team = (app: Elysia) =>
 						})
 						.where(eq(college_users.id, userid));
 
-					return `team ${code} created`;
+					return `Team ${code} created`;
 				},
 				{
 					headers: t.Object({
-						userid: t.Optional(t.String()),
+						userid: t.String({
+							minLength: 36,
+							maxLength: 36,
+							error: "Invalid user id",
+						}),
 					}),
 					body: t.Object({
-						name: t.String(),
+						name: t.String({
+							minLength: 3,
+							maxLength: 50,
+							error: "Invalid team name",
+						}),
 					}),
 					detail: {
 						summary: "Create a team",
@@ -78,11 +83,6 @@ export const team = (app: Elysia) =>
 			.post(
 				"/join/:id",
 				async ({ set, log, headers: { userid }, params: { id } }) => {
-					if (!userid) {
-						set.status = 401;
-						throw new Error("User not logged in");
-					}
-
 					log.info(`getting user details for user ${userid}`);
 
 					const user = await db.query.college_users.findFirst({
@@ -93,10 +93,12 @@ export const team = (app: Elysia) =>
 					});
 
 					if (!user) {
-						return "user not found";
+						set.status = 404;
+						return "User not found";
 					}
 					if (user.team && user.team.code === id) {
-						return "user already in a team";
+						set.status = 400;
+						return "User already in a team";
 					}
 
 					const team = await db.query.teams.findFirst({
@@ -104,6 +106,7 @@ export const team = (app: Elysia) =>
 					});
 
 					if (!team) {
+						set.status = 404;
 						return "team not found";
 					}
 
@@ -118,7 +121,18 @@ export const team = (app: Elysia) =>
 				},
 				{
 					headers: t.Object({
-						userid: t.Optional(t.String()),
+						userid: t.String({
+							minLength: 36,
+							maxLength: 36,
+							error: "Invalid user id",
+						}),
+					}),
+					params: t.Object({
+						id: t.String({
+							minLength: 8,
+							maxLength: 8,
+							error: "Invalid team id",
+						}),
 					}),
 					detail: {
 						summary: "Join a team",
@@ -133,13 +147,6 @@ export const team = (app: Elysia) =>
 			.post(
 				"/leave",
 				async ({ set, log, headers: { userid, teamid } }) => {
-					if (!userid || !teamid) {
-						set.status = 401;
-						throw new Error(
-							"User not logged in or team not provided",
-						);
-					}
-
 					const user = await db.query.college_users.findFirst({
 						where: eq(college_users.id, userid),
 						with: {
@@ -147,23 +154,27 @@ export const team = (app: Elysia) =>
 						},
 					});
 
-					const team = await db.query.teams.findFirst({
+					const team_exists = await db.query.teams.findFirst({
 						where: eq(teams.code, teamid),
 					});
 
 					if (!user) {
-						return "user not found";
+						set.status = 404;
+						return "User not found";
 					}
 					if (user.team && user.team.code !== teamid) {
-						return "user not in a team";
+						set.status = 400;
+						return "User not in a team";
 					}
 
-					if (!team) {
-						return "team not found";
+					if (!team_exists) {
+						set.status = 404;
+						return "Team not found";
 					}
 
-					if (user.email === team.leader_email) {
-						return "leader cannot leave the team";
+					if (user.email === team_exists.leader_email) {
+						set.status = 400;
+						return "Leader cannot leave the team";
 					}
 
 					await db
@@ -173,12 +184,20 @@ export const team = (app: Elysia) =>
 						})
 						.where(eq(college_users.id, userid));
 
-					return `user ${user.email} left team ${teamid}`;
+					return `User ${user.email} left team ${team_exists.name}`;
 				},
 				{
 					headers: t.Object({
-						userid: t.Optional(t.String()),
-						teamid: t.Optional(t.String()),
+						userid: t.String({
+							minLength: 36,
+							maxLength: 36,
+							error: "Invalid user id",
+						}),
+						teamid: t.String({
+							minLength: 8,
+							maxLength: 8,
+							error: "Invalid team id",
+						}),
 					}),
 					detail: {
 						summary: "Leave a team",
@@ -193,33 +212,48 @@ export const team = (app: Elysia) =>
 			.post(
 				"/delete/:id",
 				async ({ set, log, headers: { userid }, params: { id } }) => {
-					const team = await db.query.teams.findFirst({
+					const team_exists = await db.query.teams.findFirst({
 						where: eq(teams.code, id),
 					});
-					if (!team || !userid) {
+
+					if (!team_exists || !userid) {
 						set.status = 404;
-						return "team not found or user not logged in";
+						return "Team not found or user not logged in";
 					}
 
 					const user = await db.query.college_users.findFirst({
 						where: eq(college_users.id, userid),
 					});
 
-					if (user && user.email !== team.leader_email) {
+					if (user && user.email !== team_exists.leader_email) {
 						set.status = 401;
-						return "user not authorized to delete the team";
+						return "User not authorized to delete the team";
 					}
 
 					await db
 						.update(college_users)
 						.set({ team_id: null })
 						.where(eq(college_users.team_id, id));
+
 					await db.delete(teams).where(eq(teams.code, id));
-					return `team ${id} deleted`;
+
+					return `Team ${team_exists.name} deleted`;
 				},
 				{
-					params: t.Object({ id: t.String() }),
-					headers: t.Object({ userid: t.Optional(t.String()) }),
+					params: t.Object({
+						id: t.String({
+							minLength: 8,
+							maxLength: 8,
+							error: "Invalid team id",
+						}),
+					}),
+					headers: t.Object({
+						userid: t.String({
+							minLength: 36,
+							mixLength: 36,
+							error: "Invalid user",
+						}),
+					}),
 					detail: {
 						summary: "Delete a team",
 						description: "Delete a team",

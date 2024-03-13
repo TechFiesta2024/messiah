@@ -27,10 +27,6 @@ export const workshop = (app: Elysia) =>
 				"/join/:id",
 				async ({ set, log, headers: { userid }, params: { id } }) => {
 					log.info(`/workshop/join : ${id}`);
-					if (!userid) {
-						set.status = 401;
-						throw new Error("user not logged in");
-					}
 
 					const user = await db.query.college_users.findFirst({
 						where: eq(college_users.id, userid),
@@ -50,6 +46,23 @@ export const workshop = (app: Elysia) =>
 						};
 					}
 
+					if (
+						(user.workshop.some(
+							(obj) => obj.category === category.hardware,
+						) &&
+							id === category.product_design) ||
+						(user.workshop.some(
+							(obj) => obj.category === category.product_design,
+						) &&
+							id === category.hardware)
+					) {
+						set.status = 400;
+						return {
+							message:
+								"Cannot join workshop as it coliides with another workshop 🥺",
+						};
+					}
+
 					await db.insert(workshops).values({
 						category: id as category,
 						user_email: user.email,
@@ -61,10 +74,14 @@ export const workshop = (app: Elysia) =>
 				},
 				{
 					params: t.Object({
-						id: t.Enum(category),
+						id: t.Enum(category, { error: "Invalid workshop" }),
 					}),
 					headers: t.Object({
-						userid: t.Optional(t.String()),
+						userid: t.String({
+							minLength: 36,
+							maxLength: 36,
+							error: "Invalid user id",
+						}),
 					}),
 					detail: {
 						summary: "Join a workshop",
