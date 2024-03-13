@@ -90,24 +90,36 @@ export const user = (app: Elysia) =>
 				},
 				{
 					body: t.Object({
-						name: t.String(),
+						name: t.String({
+							error: "Name is required",
+							minLength: 4,
+						}),
 						email: t.String({
 							format: "email",
-							errror: "invalid email",
+							errror: "Invalid email",
 						}),
-						school: t.String(),
+						school: t.String({
+							error: "School is required",
+							minLength: 3,
+						}),
 						contact: t.String({
 							maxLength: 10,
 							minLength: 10,
-							error: "invalid contact number",
+							error: "Invalid contact number",
 						}),
-						class: t.String(),
+						class: t.String({
+							error: "Class is required",
+							minLength: 1,
+						}),
 						guardian_contact: t.String({
 							maxLength: 10,
 							minLength: 10,
-							error: "invalid contact number",
+							error: "Invalid contact number",
 						}),
-						guardian_name: t.String(),
+						guardian_name: t.String({
+							error: "Guardian name is required",
+							minLength: 4,
+						}),
 					}),
 					detail: {
 						summary: "Register/Update/Login a school user",
@@ -207,19 +219,31 @@ export const user = (app: Elysia) =>
 				},
 				{
 					body: t.Object({
-						name: t.String(),
+						name: t.String({
+							minLength: 4,
+							error: "Name is required",
+						}),
 						email: t.String({
 							format: "email",
-							errror: "invalid email",
+							errror: "Invalid email",
 						}),
-						college: t.String(),
+						college: t.String({
+							minLength: 3,
+							error: "College is required",
+						}),
 						contact: t.String({
 							maxLength: 10,
 							minLength: 10,
-							error: "invalid contact number",
+							error: "Invalid contact number",
 						}),
-						stream: t.String(),
-						year: t.String(),
+						stream: t.String({
+							minLength: 1,
+							error: "Stream is required",
+						}),
+						year: t.String({
+							minLength: 1,
+							error: "Year is required",
+						}),
 					}),
 					detail: {
 						summary: "Register/Update/Login a college user",
@@ -300,7 +324,11 @@ export const user = (app: Elysia) =>
 				},
 				{
 					headers: t.Object({
-						email: t.String(),
+						email: t.String({
+							minLength: 4,
+							format: "email",
+							error: "Email is required",
+						}),
 					}),
 					detail: {
 						summary: "Get user details",
