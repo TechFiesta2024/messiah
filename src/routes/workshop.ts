@@ -4,7 +4,12 @@ import { Elysia, t } from "elysia";
 import { db } from "../db";
 import { college_users, workshops } from "../db/schema";
 import { sendEmail } from "../email";
-import { WorkshopHardwareEmailHtml } from "../emails/hardwareWorkshop";
+import {
+	WorkshopHardwareEmailHtml,
+	WorkshopProductEmailHtml,
+	workshopCADHTML,
+	workshopCTFHTML,
+} from "../emails";
 import { log } from "../log";
 
 enum category {
@@ -78,6 +83,30 @@ export const workshop = (app: Elysia) =>
 						);
 					}
 
+					if (id === category.product_design) {
+						await sendEmail(
+							user.name,
+							user.email,
+							"Successfully joined product design workshop 🎨",
+							WorkshopProductEmailHtml,
+						);
+					}
+					if (id === category.ctf) {
+						await sendEmail(
+							user.name,
+							user.email,
+							"Successfully joined CTF workshop 👾",
+							workshopCTFHTML,
+						);
+					}
+					if (id === category.hardware) {
+						await sendEmail(
+							user.name,
+							user.email,
+							"Successfully joined CAD workshop 🏛",
+							workshopCADHTML,
+						);
+					}
 					return {
 						message: "Successfully joined",
 					};
