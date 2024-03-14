@@ -4,6 +4,7 @@ import { Elysia, t } from "elysia";
 import { db } from "../db";
 import { college_users, workshops } from "../db/schema";
 import { sendEmail } from "../email";
+import { WorkshopHardwareEmailHtml } from "../emails/hardwareWorkshop";
 import { log } from "../log";
 
 enum category {
@@ -67,6 +68,15 @@ export const workshop = (app: Elysia) =>
 						category: id as category,
 						user_email: user.email,
 					});
+
+					if (id === category.hardware) {
+						await sendEmail(
+							user.name,
+							user.email,
+							"Successfully joined hardware workshop ⚡",
+							WorkshopHardwareEmailHtml,
+						);
+					}
 
 					return {
 						message: "Successfully joined",
