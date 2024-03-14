@@ -99,7 +99,7 @@ export const workshop = (app: Elysia) =>
 							workshopCTFHTML,
 						);
 					}
-					if (id === category.hardware) {
+					if (id === category.cad) {
 						await sendEmail(
 							user.name,
 							user.email,
