@@ -1,22 +1,36 @@
 import { eq } from "drizzle-orm";
-import { Elysia, t } from "elysia";
+import { type Elysia, t } from "elysia";
 
 import { db } from "../db";
 import { college_users, workshops } from "../db/schema";
 import { sendEmail } from "../email";
 import {
-	WorkshopHardwareEmailHtml,
-	WorkshopProductEmailHtml,
-	workshopCADHTML,
-	workshopCTFHTML,
+	fpga_email,
+	backend_deploy_email,
+	circuit_email,
+	business_logic_email,
+	ctf_signup_email,
+	git_github_email,
+	product_design_cycle_email,
+	embedded_systems,
+	iot_workshop_email,
+	robotics_email,
+	cad_signup_email,
 } from "../emails";
 import { log } from "../log";
 
 enum category {
-	product_design = "product_design",
-	hardware = "hardware",
+	product_design_lifecycle = "product_design_lifecycle",
+	git = "git",
+	business_logic = "business_logic",
+	backend_deploy = "backend_deploy",
+	robotics = "robotics",
 	cad = "cad",
 	ctf = "ctf",
+	circuits = "circuits",
+	iot = "iot",
+	fpga = "fpga",
+	embedded = "embedded",
 }
 
 export const workshop = (app: Elysia) =>
@@ -52,61 +66,127 @@ export const workshop = (app: Elysia) =>
 						};
 					}
 
-					if (
-						(user.workshop.some(
-							(obj) => obj.category === category.hardware,
-						) &&
-							id === category.product_design) ||
-						(user.workshop.some(
-							(obj) => obj.category === category.product_design,
-						) &&
-							id === category.hardware)
-					) {
-						set.status = 400;
-						return {
-							message:
-								"Cannot join workshop as it coliides with another workshop 🥺",
-						};
-					}
+					// if (
+					// 	(user.workshop.some(
+					// 		(obj) => obj.category === category.hardware,
+					// 	) &&
+					// 		id === category.product_design) ||
+					// 	(user.workshop.some(
+					// 		(obj) => obj.category === category.product_design,
+					// 	) &&
+					// 		id === category.hardware)
+					// ) {
+					// 	set.status = 400;
+					// 	return {
+					// 		message:
+					// 			"Cannot join workshop as it coliides with another workshop 🥺",
+					// 	};
+					// }
 
 					await db.insert(workshops).values({
 						category: id as category,
 						user_email: user.email,
 					});
 
-					if (id === category.hardware) {
+					if (id === category.product_design_lifecycle) {
 						await sendEmail(
 							user.name,
 							user.email,
-							"Successfully joined hardware workshop ⚡",
-							WorkshopHardwareEmailHtml,
+							"Successfully joined product design lifecycle workshop 🎨",
+							product_design_cycle_email,
 						);
 					}
 
-					if (id === category.product_design) {
+					if (id === category.git) {
 						await sendEmail(
 							user.name,
 							user.email,
-							"Successfully joined product design workshop 🎨",
-							WorkshopProductEmailHtml,
+							"Successfully joined git workshop 🎨",
+							git_github_email,
 						);
 					}
-					if (id === category.ctf) {
+
+					if (id === category.business_logic) {
 						await sendEmail(
 							user.name,
 							user.email,
-							"Successfully joined CTF workshop 👾",
-							workshopCTFHTML,
+							"Successfully joined business logic workshop 🎨",
+							business_logic_email,
 						);
 					}
+
+					if (id === category.backend_deploy) {
+						await sendEmail(
+							user.name,
+							user.email,
+							"Successfully joined backend deploy workshop 🎨",
+							backend_deploy_email,
+						);
+					}
+
 					if (id === category.cad) {
 						await sendEmail(
 							user.name,
 							user.email,
-							"Successfully joined CAD workshop 🏛",
-							workshopCADHTML,
+							"Successfully joined cad workshop 🎨",
+							cad_signup_email,
 						);
 					}
+
+					if (id === category.ctf) {
+						await sendEmail(
+							user.name,
+							user.email,
+							"Successfully joined ctf workshop 🎨",
+							ctf_signup_email,
+						);
+					}
+
+					if (id === category.fpga) {
+						await sendEmail(
+							user.name,
+							user.email,
+							"Successfully joined fpga workshop 🎨",
+							fpga_email,
+						);
+					}
+
+					if (id === category.embedded) {
+						await sendEmail(
+							user.name,
+							user.email,
+							"Successfully joined embedded systems workshop 🎨",
+							embedded_systems,
+						);
+					}
+
+					if (id === category.circuits) {
+						await sendEmail(
+							user.name,
+							user.email,
+							"Successfully joined circuits workshop 🎨",
+							circuit_email,
+						);
+					}
+
+					if (id === category.iot) {
+						await sendEmail(
+							user.name,
+							user.email,
+							"Successfully joined iot workshop 🎨",
+							iot_workshop_email,
+						);
+					}
+
+					if (id === category.robotics) {
+						await sendEmail(
+							user.name,
+							user.email,
+							"Successfully joined robotics workshop 🎨",
+							robotics_email,
+						);
+					}
+
 					return {
 						message: "Successfully joined",
 					};

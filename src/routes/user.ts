@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
-import { Elysia, t } from "elysia";
+import { type Elysia, t } from "elysia";
 
 import { db } from "../db";
 import { college_users, school_users } from "../db/schema";
@@ -76,12 +76,12 @@ export const user = (app: Elysia) =>
 
 					log.info(`new user ${newUser[0].email} logged in`);
 
-					await sendEmail(
-						newUser[0].name,
-						newUser[0].email,
-						"Welcome To TechFiesta24 🎉",
-						WelcomeEmailHtml,
-					);
+					// await sendEmail(
+					// 	newUser[0].name,
+					// 	newUser[0].email,
+					// 	"Welcome To TechFiesta24 🎉",
+					// 	WelcomeEmailHtml,
+					// );
 
 					return {
 						message: `Welcome ${newUser[0].name}`,
@@ -205,12 +205,12 @@ export const user = (app: Elysia) =>
 
 					log.info(`new user ${newUser[0].email} logged in`);
 
-					await sendEmail(
-						newUser[0].name,
-						newUser[0].email,
-						"Welcome To TechFiesta24 🎉",
-						WelcomeEmailHtml,
-					);
+					// await sendEmail(
+					// 	newUser[0].name,
+					// 	newUser[0].email,
+					// 	"Welcome To TechFiesta24 🎉",
+					// 	WelcomeEmailHtml,
+					// );
 
 					return {
 						message: `Welcome ${newUser[0].name}`,

@@ -28,10 +28,17 @@ export const college_users_relations = relations(
 );
 
 export const workshop_enum = pgEnum("category", [
-	"product_design",
-	"hardware",
+	"product_design_lifecycle",
+	"git",
+	"business_logic",
+	"backend_deploy",
 	"cad",
 	"ctf",
+	"robotics",
+	"circuits",
+	"iot",
+	"fpga",
+	"embedded",
 ]);
 
 export const workshops = pgTable("workshop", {

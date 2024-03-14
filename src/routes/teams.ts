@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { Elysia, t } from "elysia";
+import { type Elysia, t } from "elysia";
 
 import { db } from "../db";
 import { college_users, teams } from "../db/schema";
