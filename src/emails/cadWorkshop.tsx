@@ -13,7 +13,7 @@ import {
 import { render } from "@react-email/render";
 import * as React from "react";
 
-export default function WorkshopCADEmail() {
+function WorkshopCADEmail() {
 	return (
 		<Html>
 			<Preview>CAD Workshop</Preview>
@@ -134,3 +134,7 @@ export default function WorkshopCADEmail() {
 		</Html>
 	);
 }
+
+export const workshopCADHTML = render(<WorkshopCADEmail />, {
+	pretty: true,
+});

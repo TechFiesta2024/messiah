@@ -13,10 +13,10 @@ import {
 import { render } from "@react-email/render";
 import * as React from "react";
 
-export default function WorkshopCADEmail() {
+function WorkshopCTF() {
 	return (
 		<Html>
-			<Preview>CAD Workshop</Preview>
+			<Preview>Capture The Flag Workshop</Preview>
 			<Tailwind
 				config={{
 					theme: {
@@ -35,7 +35,7 @@ export default function WorkshopCADEmail() {
 						<Heading className="text-center my-0 leading-8">
 							Thank You for joining
 							<br />
-							<span className="text-red">CAD</span>
+							<span className="text-red">Capture The Flag</span>
 							&nbsp;Workshop
 						</Heading>
 
@@ -134,3 +134,7 @@ export default function WorkshopCADEmail() {
 		</Html>
 	);
 }
+
+export const workshopCTFHTML = render(<WorkshopCTF />, {
+	pretty: true,
+});
