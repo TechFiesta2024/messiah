@@ -5,17 +5,17 @@ import { db } from "../db";
 import { college_users, workshops } from "../db/schema";
 import { sendEmail } from "../email";
 import {
-	fpga_email,
 	backend_deploy_email,
-	circuit_email,
 	business_logic_email,
-	ctf_signup_email,
-	git_github_email,
-	product_design_cycle_email,
-	embedded_systems,
-	iot_workshop_email,
-	robotics_email,
 	cad_signup_email,
+	circuit_email,
+	ctf_signup_email,
+	embedded_systems,
+	fpga_email,
+	git_github_email,
+	iot_workshop_email,
+	product_design_cycle_email,
+	robotics_email,
 } from "../emails";
 import { log } from "../log";
 
