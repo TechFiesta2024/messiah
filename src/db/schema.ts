@@ -27,7 +27,7 @@ export const college_users_relations = relations(
 	}),
 );
 
-export const workshop_enum = pgEnum("category", [
+export const workshop_enum = pgEnum("workshop_category", [
 	"product_design_lifecycle",
 	"git",
 	"business_logic",
@@ -67,7 +67,7 @@ export const teams_relations = relations(teams, ({ many }) => ({
 	event: many(events),
 }));
 
-export const event_enum = pgEnum("category", [
+export const event_enum = pgEnum("event_category", [
 	"creative_writing",
 	"waste_to_art",
 	"extempore",

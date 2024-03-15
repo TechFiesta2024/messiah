@@ -74,14 +74,14 @@ export const user = (app: Elysia) =>
 							email: school_users.email,
 						});
 
-					log.info(`new user ${newUser[0].email} logged in`);
-
 					await sendEmail(
 						newUser[0].name,
 						newUser[0].email,
 						"Welcome To TechFiesta24 🎉",
 						welcome_email,
 					);
+
+					log.info(`new user ${newUser[0].email} logged in`);
 
 					return {
 						message: `Welcome ${newUser[0].name}`,
@@ -205,12 +205,12 @@ export const user = (app: Elysia) =>
 
 					log.info(`new user ${newUser[0].email} logged in`);
 
-					// await sendEmail(
-					// 	newUser[0].name,
-					// 	newUser[0].email,
-					// 	"Welcome To TechFiesta24 🎉",
-					// 	WelcomeEmailHtml,
-					// );
+					await sendEmail(
+						newUser[0].name,
+						newUser[0].email,
+						"Welcome To TechFiesta24 🎉",
+						welcome_email,
+					);
 
 					return {
 						message: `Welcome ${newUser[0].name}`,
