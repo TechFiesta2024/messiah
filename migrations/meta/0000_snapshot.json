@@ -1,5 +1,5 @@
 {
-  "id": "ba44cb01-c883-4b84-adc5-cd88f79c816c",
+  "id": "c993264f-f20d-4637-83ed-32f995b4ea96",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -238,7 +238,7 @@
       "columns": {
         "category": {
           "name": "category",
-          "type": "category",
+          "type": "event_category",
           "primaryKey": false,
           "notNull": true
         },
@@ -477,7 +477,7 @@
       "columns": {
         "category": {
           "name": "category",
-          "type": "category",
+          "type": "workshop_category",
           "primaryKey": false,
           "notNull": true
         },
@@ -509,13 +509,41 @@
     }
   },
   "enums": {
-    "category": {
-      "name": "category",
+    "event_category": {
+      "name": "event_category",
       "values": {
-        "product_design": "product_design",
-        "hardware": "hardware",
+        "creative_writing": "creative_writing",
+        "waste_to_art": "waste_to_art",
+        "extempore": "extempore",
+        "painting": "painting",
+        "ui_ux": "ui_ux",
+        "frontend": "frontend",
+        "ctf": "ctf",
+        "webathon": "webathon",
+        "treasure_hunt": "treasure_hunt",
+        "maze_solver": "maze_solver",
+        "race": "race",
+        "iot": "iot",
+        "circuits": "circuits",
+        "science_exhibition": "science_exhibition",
         "cad": "cad",
-        "ctf": "ctf"
+        "math": "math"
+      }
+    },
+    "workshop_category": {
+      "name": "workshop_category",
+      "values": {
+        "product_design_lifecycle": "product_design_lifecycle",
+        "git": "git",
+        "business_logic": "business_logic",
+        "backend_deploy": "backend_deploy",
+        "cad": "cad",
+        "ctf": "ctf",
+        "robotics": "robotics",
+        "circuits": "circuits",
+        "iot": "iot",
+        "fpga": "fpga",
+        "embedded": "embedded"
       }
     }
   },

@@ -1,5 +1,11 @@
 DO $$ BEGIN
- CREATE TYPE "category" AS ENUM('product_design', 'hardware', 'cad', 'ctf');
+ CREATE TYPE "event_category" AS ENUM('creative_writing', 'waste_to_art', 'extempore', 'painting', 'ui_ux', 'frontend', 'ctf', 'webathon', 'treasure_hunt', 'maze_solver', 'race', 'iot', 'circuits', 'science_exhibition', 'cad', 'math');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "workshop_category" AS ENUM('product_design_lifecycle', 'git', 'business_logic', 'backend_deploy', 'cad', 'ctf', 'robotics', 'circuits', 'iot', 'fpga', 'embedded');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -43,7 +49,7 @@ CREATE TABLE IF NOT EXISTS "communities" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "events" (
-	"category" "category" NOT NULL,
+	"category" "event_category" NOT NULL,
 	"team_id" text,
 	"college_user_id" uuid,
 	"school_user_id" uuid,
@@ -78,7 +84,7 @@ CREATE TABLE IF NOT EXISTS "teams" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "workshop" (
-	"category" "category" NOT NULL,
+	"category" "workshop_category" NOT NULL,
 	"user_email" text NOT NULL
 );
 --> statement-breakpoint

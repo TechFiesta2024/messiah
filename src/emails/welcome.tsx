@@ -13,10 +13,9 @@ import {
 	Tailwind,
 	Text,
 } from "@react-email/components";
-import { render } from "@react-email/render";
 import * as React from "react";
 
-function WelcomeEmail() {
+export default function WelcomeEmail() {
 	return (
 		<Html>
 			<Head />
@@ -63,14 +62,25 @@ function WelcomeEmail() {
 
 						<ul>
 							<li>
-								<strong>What to Expect:</strong> Techfiesta24
-								promises to be a day packed with innovation,
-								learning, and networking. Whether you're a
-								seasoned tech enthusiast or just starting your
-								journey, our event has something for everyone.
-								Engage with industry experts, participate in
-								hands-on workshops, and explore the test in
-								technology trends.
+								<strong>What to Expect From TechFiesta:</strong>{" "}
+								Techfiesta24 promises to be a day packed with
+								innovation, learning, and networking. Whether
+								you're a seasoned tech enthusiast or just
+								starting your journey, our event has something
+								for everyone.
+							</li>
+							<li>
+								<strong>
+									What to Expect From Humatronics:
+								</strong>
+								Showcase your diverse talents in extempore
+								speaking, painting, math problem-solving, and
+								science exhibitions. From spontaneous speeches
+								to intricate artworks, from complex
+								problem-solving to groudbreaking scientific
+								displays. Humatronics celebrates brilliance
+								across multiple disciplines, fostering a culture
+								of exploration and discovery
 							</li>
 							<li>
 								<strong>Connect with Us:</strong> Stay connected
@@ -83,11 +93,18 @@ function WelcomeEmail() {
 								<strong>Any Questions?</strong> If you have any
 								questions or require additional information,
 								feel free to reach out to our dedicated support
-								team at <Link>contact@aotfiesta24.tech</Link>.
+								team at{" "}
+								<Link href="mailto:contact@aotfiesta24.tech">
+									contact@aotfiesta24.tech
+								</Link>
+								.
 							</li>
 						</ul>
-						<Section className="text-center">
-							<Button className="bg-white text-black rounded-lg py-3 px-[18px]">
+						<Section className="text-center mt-20">
+							<Button
+								href="https://arrakis-techfiesta.vercel.app/dashboard"
+								className="bg-white text-black rounded-lg py-3 px-[18px]"
+							>
 								Go to your dashboard
 							</Button>
 						</Section>
@@ -104,7 +121,3 @@ function WelcomeEmail() {
 		</Html>
 	);
 }
-
-export const WelcomeEmailHtml = render(<WelcomeEmail />, {
-	pretty: true,
-});

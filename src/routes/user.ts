@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
-import { Elysia, t } from "elysia";
+import { type Elysia, t } from "elysia";
 
 import { db } from "../db";
 import { college_users, school_users } from "../db/schema";
 import { sendEmail } from "../email";
-import { WelcomeEmailHtml } from "../emails/welcome";
+import { welcome_email } from "../emails";
 import { log } from "../log";
 
 export const user = (app: Elysia) =>
@@ -74,14 +74,14 @@ export const user = (app: Elysia) =>
 							email: school_users.email,
 						});
 
-					log.info(`new user ${newUser[0].email} logged in`);
-
 					await sendEmail(
 						newUser[0].name,
 						newUser[0].email,
 						"Welcome To TechFiesta24 🎉",
-						WelcomeEmailHtml,
+						welcome_email,
 					);
+
+					log.info(`new user ${newUser[0].email} logged in`);
 
 					return {
 						message: `Welcome ${newUser[0].name}`,
@@ -209,7 +209,7 @@ export const user = (app: Elysia) =>
 						newUser[0].name,
 						newUser[0].email,
 						"Welcome To TechFiesta24 🎉",
-						WelcomeEmailHtml,
+						welcome_email,
 					);
 
 					return {

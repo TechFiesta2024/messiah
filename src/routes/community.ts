@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { Elysia, t } from "elysia";
+import { type Elysia, t } from "elysia";
 import postgres from "postgres";
 
 import { db } from "../db";
