@@ -56,7 +56,7 @@ export const workshop = (app: Elysia) =>
 					});
 
 					if (!user) {
-						set.status = 400;
+						set.status = 403;
 						throw new Error("user not found");
 					}
 
@@ -101,7 +101,7 @@ export const workshop = (app: Elysia) =>
 						await sendEmail(
 							user.name,
 							user.email,
-							"Successfully joined git workshop 🎨",
+							"Successfully joined git workshop 💻",
 							git_github_email,
 						);
 					}
@@ -110,7 +110,7 @@ export const workshop = (app: Elysia) =>
 						await sendEmail(
 							user.name,
 							user.email,
-							"Successfully joined business logic workshop 🎨",
+							"Successfully joined business logic workshop 📈",
 							business_logic_email,
 						);
 					}
@@ -119,7 +119,7 @@ export const workshop = (app: Elysia) =>
 						await sendEmail(
 							user.name,
 							user.email,
-							"Successfully joined backend deploy workshop 🎨",
+							"Successfully joined backend deploy workshop 🚀",
 							backend_deploy_email,
 						);
 					}
@@ -128,7 +128,7 @@ export const workshop = (app: Elysia) =>
 						await sendEmail(
 							user.name,
 							user.email,
-							"Successfully joined cad workshop 🎨",
+							"Successfully joined cad workshop 🏠",
 							cad_signup_email,
 						);
 					}
@@ -137,7 +137,7 @@ export const workshop = (app: Elysia) =>
 						await sendEmail(
 							user.name,
 							user.email,
-							"Successfully joined ctf workshop 🎨",
+							"Successfully joined ctf workshop 👾",
 							ctf_signup_email,
 						);
 					}
@@ -146,7 +146,7 @@ export const workshop = (app: Elysia) =>
 						await sendEmail(
 							user.name,
 							user.email,
-							"Successfully joined fpga workshop 🎨",
+							"Successfully joined fpga workshop ⚡",
 							fpga_email,
 						);
 					}
@@ -155,7 +155,7 @@ export const workshop = (app: Elysia) =>
 						await sendEmail(
 							user.name,
 							user.email,
-							"Successfully joined embedded systems workshop 🎨",
+							"Successfully joined embedded systems workshop 💾",
 							embedded_systems,
 						);
 					}
@@ -164,7 +164,7 @@ export const workshop = (app: Elysia) =>
 						await sendEmail(
 							user.name,
 							user.email,
-							"Successfully joined circuits workshop 🎨",
+							"Successfully joined circuits workshop 💡",
 							circuit_email,
 						);
 					}
@@ -173,7 +173,7 @@ export const workshop = (app: Elysia) =>
 						await sendEmail(
 							user.name,
 							user.email,
-							"Successfully joined iot workshop 🎨",
+							"Successfully joined iot workshop 📡",
 							iot_workshop_email,
 						);
 					}
@@ -182,7 +182,7 @@ export const workshop = (app: Elysia) =>
 						await sendEmail(
 							user.name,
 							user.email,
-							"Successfully joined robotics workshop 🎨",
+							"Successfully joined robotics workshop 🤖",
 							robotics_email,
 						);
 					}
