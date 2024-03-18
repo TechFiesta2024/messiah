@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { type Elysia, t } from "elysia";
 
 import { db } from "../db";
-import { college_users, workshops } from "../db/schema";
+import { school_users, college_users, workshops } from "../db/schema";
 import { sendEmail } from "../email";
 import {
 	backend_deploy_email,
@@ -48,19 +48,28 @@ export const workshop = (app: Elysia) =>
 				async ({ set, log, headers: { userid }, params: { id } }) => {
 					log.info(`/workshop/join : ${id}`);
 
-					const user = await db.query.college_users.findFirst({
+					const school_user = await db.query.school_users.findFirst({
+						where: eq(school_users.id, userid),
+					});
+
+					if (school_user) {
+						set.status = 401
+						throw new Error("School users can't join workshop")
+					}
+
+					const college_user = await db.query.college_users.findFirst({
 						where: eq(college_users.id, userid),
 						with: {
 							workshop: true,
 						},
 					});
 
-					if (!user) {
+					if (!college_user) {
 						set.status = 403;
-						throw new Error("user not found");
+						throw new Error("User not found");
 					}
 
-					if (user.workshop.some((obj) => obj.category === id)) {
+					if (college_user.workshop.some((obj) => obj.category === id)) {
 						return {
 							message: "Already joined",
 						};
@@ -85,13 +94,13 @@ export const workshop = (app: Elysia) =>
 
 					await db.insert(workshops).values({
 						category: id as category,
-						user_email: user.email,
+						user_email: college_user.email,
 					});
 
 					if (id === category.product_design_lifecycle) {
 						await sendEmail(
-							user.name,
-							user.email,
+							college_user.name,
+							college_user.email,
 							"Successfully joined product design lifecycle workshop 🎨",
 							product_design_cycle_email,
 						);
@@ -99,8 +108,8 @@ export const workshop = (app: Elysia) =>
 
 					if (id === category.git) {
 						await sendEmail(
-							user.name,
-							user.email,
+							college_user.name,
+							college_user.email,
 							"Successfully joined git workshop 💻",
 							git_github_email,
 						);
@@ -108,8 +117,8 @@ export const workshop = (app: Elysia) =>
 
 					if (id === category.business_logic) {
 						await sendEmail(
-							user.name,
-							user.email,
+							college_user.name,
+							college_user.email,
 							"Successfully joined business logic workshop 📈",
 							business_logic_email,
 						);
@@ -117,8 +126,8 @@ export const workshop = (app: Elysia) =>
 
 					if (id === category.backend_deploy) {
 						await sendEmail(
-							user.name,
-							user.email,
+							college_user.name,
+							college_user.email,
 							"Successfully joined backend deploy workshop 🚀",
 							backend_deploy_email,
 						);
@@ -126,8 +135,8 @@ export const workshop = (app: Elysia) =>
 
 					if (id === category.cad) {
 						await sendEmail(
-							user.name,
-							user.email,
+							college_user.name,
+							college_user.email,
 							"Successfully joined cad workshop 🏠",
 							cad_signup_email,
 						);
@@ -135,8 +144,8 @@ export const workshop = (app: Elysia) =>
 
 					if (id === category.ctf) {
 						await sendEmail(
-							user.name,
-							user.email,
+							college_user.name,
+							college_user.email,
 							"Successfully joined ctf workshop 👾",
 							ctf_signup_email,
 						);
@@ -144,8 +153,8 @@ export const workshop = (app: Elysia) =>
 
 					if (id === category.fpga) {
 						await sendEmail(
-							user.name,
-							user.email,
+							college_user.name,
+							college_user.email,
 							"Successfully joined fpga workshop ⚡",
 							fpga_email,
 						);
@@ -153,8 +162,8 @@ export const workshop = (app: Elysia) =>
 
 					if (id === category.embedded) {
 						await sendEmail(
-							user.name,
-							user.email,
+							college_user.name,
+							college_user.email,
 							"Successfully joined embedded systems workshop 💾",
 							embedded_systems,
 						);
@@ -162,8 +171,8 @@ export const workshop = (app: Elysia) =>
 
 					if (id === category.circuits) {
 						await sendEmail(
-							user.name,
-							user.email,
+							college_user.name,
+							college_user.email,
 							"Successfully joined circuits workshop 💡",
 							circuit_email,
 						);
@@ -171,8 +180,8 @@ export const workshop = (app: Elysia) =>
 
 					if (id === category.iot) {
 						await sendEmail(
-							user.name,
-							user.email,
+							college_user.name,
+							college_user.email,
 							"Successfully joined iot workshop 📡",
 							iot_workshop_email,
 						);
@@ -180,8 +189,8 @@ export const workshop = (app: Elysia) =>
 
 					if (id === category.robotics) {
 						await sendEmail(
-							user.name,
-							user.email,
+							college_user.name,
+							college_user.email,
 							"Successfully joined robotics workshop 🤖",
 							robotics_email,
 						);
