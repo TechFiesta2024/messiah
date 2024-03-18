@@ -1,0 +1,1 @@
+ALTER TABLE "school_users" ALTER COLUMN "team_id" DROP DEFAULT;
