@@ -117,33 +117,34 @@ export const event = (app: Elysia) =>
 							team.school_members.length >= 1 &&
 							team.school_members.length <= 2
 						) {
-							set.status = 400;
+							if (team.event.some((obj) => obj.category === id)) {
+								return {
+									message: "Already joined",
+								};
+							}
+	
+							await db.insert(events).values({
+								category: id,
+								team_id: body.team_id,
+							});
+	
+							sendEmail(
+								team.name,
+								team.leader_email,
+								`Successfully joined ${id} event`,
+								`You have successfully joined ${id} event. We wish you all the best 🎉\n\n and you can contact us for any queries.`,
+							);
+	
+							return {
+								message: "Successfully joined",
+							};
+							
+						}
+
+						set.status = 400;
 							throw new Error(
 								"School team must have 1 - 2 members",
-							);
-						}
-
-						if (team.event.some((obj) => obj.category === id)) {
-							return {
-								message: "Already joined",
-							};
-						}
-
-						await db.insert(events).values({
-							category: id,
-							team_id: body.team_id,
-						});
-
-						sendEmail(
-							team.name,
-							team.leader_email,
-							`Successfully joined ${id} event`,
-							`You have successfully joined ${id} event. We wish you all the best 🎉\n\n and you can contact us for any queries.`,
-						);
-
-						return {
-							message: "Successfully joined",
-						};
+							);						
 					}
 
 					if (
