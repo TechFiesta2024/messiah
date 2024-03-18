@@ -10,7 +10,7 @@ export const college_users = pgTable("college_users", {
 	email: text("email").notNull().unique(),
 	college: text("college").notNull(),
 	stream: text("stream").notNull(),
-	contact: text("contact").notNull().unique(),
+	contact: text("contact").notNull(),
 	year: text("year").notNull(),
 	team_id: text("team_id").references(() => teams.code),
 });
@@ -120,11 +120,13 @@ export const school_users = pgTable("school_users", {
 	name: text("name").notNull(),
 	email: text("email").notNull().unique(),
 	school: text("school").notNull(),
-	contact: text("contact").notNull().unique(),
+	contact: text("contact").notNull(),
 	class: text("class").notNull(),
 	guardian_contact: text("gardian_contact").notNull(),
 	guardian_name: text("gardian_name").notNull(),
-	team_id: text("team_id").references(() => teams.code),
+	team_id: text("team_id")
+		.default("null")
+		.references(() => teams.code),
 });
 
 export const school_users_relations = relations(

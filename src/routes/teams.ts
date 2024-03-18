@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { type Elysia, t } from "elysia";
 
 import { db } from "../db";
-import { college_users, teams, school_users } from "../db/schema";
+import { college_users, school_users, teams } from "../db/schema";
 import { log } from "../log";
 import { generateRandomString } from "../utils";
 
