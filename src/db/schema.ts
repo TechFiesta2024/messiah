@@ -63,15 +63,18 @@ export const teams = pgTable("teams", {
 });
 
 export const teams_relations = relations(teams, ({ many }) => ({
-	members: many(college_users),
+	college_members: many(college_users),
+	school_members: many(school_users),
 	event: many(events),
 }));
 
 export const event_enum = pgEnum("event_category", [
 	"creative_writing",
 	"waste_to_art",
-	"extempore",
-	"painting",
+	"extempore_sr",
+	"extempore_jr",
+	"painting_sr",
+	"painting_jr",
 	"ui_ux",
 	"frontend",
 	"ctf",
@@ -88,15 +91,9 @@ export const event_enum = pgEnum("event_category", [
 
 export const events = pgTable("events", {
 	category: event_enum("category").notNull(),
-	team_id: text("team_id")
-		.unique()
-		.references(() => teams.code),
-	college_user_id: uuid("college_user_id")
-		.unique()
-		.references(() => college_users.id),
-	school_user_id: uuid("school_user_id")
-		.unique()
-		.references(() => school_users.id),
+	team_id: text("team_id").references(() => teams.code),
+	college_user_id: uuid("college_user_id").references(() => college_users.id),
+	school_user_id: uuid("school_user_id").references(() => school_users.id),
 	payment_status: text("payment_status").default("not_paid").notNull(),
 });
 
@@ -127,11 +124,19 @@ export const school_users = pgTable("school_users", {
 	class: text("class").notNull(),
 	guardian_contact: text("gardian_contact").notNull(),
 	guardian_name: text("gardian_name").notNull(),
+	team_id: text("team_id").references(() => teams.code),
 });
 
-export const school_users_relations = relations(school_users, ({ many }) => ({
-	event: many(events),
-}));
+export const school_users_relations = relations(
+	school_users,
+	({ one, many }) => ({
+		event: many(events),
+		team: one(teams, {
+			fields: [school_users.team_id],
+			references: [teams.code],
+		}),
+	}),
+);
 
 export const communities = pgTable("communities", {
 	id: uuid("id").primaryKey(),

@@ -304,6 +304,7 @@ export const user = (app: Elysia) =>
 						where: eq(school_users.email, email),
 						with: {
 							event: true,
+							team: true,
 						},
 					});
 
