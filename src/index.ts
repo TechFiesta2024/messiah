@@ -4,11 +4,11 @@ import { Elysia } from "elysia";
 
 import { log } from "./log";
 import { community } from "./routes/community";
+import { event } from "./routes/events";
 import { health_check } from "./routes/health_check";
 import { team } from "./routes/teams";
 import { user } from "./routes/user";
 import { workshop } from "./routes/workshop";
-import { event } from "./routes/events";
 
 const app = new Elysia()
 	.use(
