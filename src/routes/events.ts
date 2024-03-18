@@ -28,7 +28,7 @@ enum category {
 }
 
 export const event = (app: Elysia) =>
-	app.group("/event", (app) =>
+	app.group("/events", (app) =>
 		app
 			.use(log)
 			.onError((ctx) => {
