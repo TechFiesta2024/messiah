@@ -124,9 +124,7 @@ export const school_users = pgTable("school_users", {
 	class: text("class").notNull(),
 	guardian_contact: text("gardian_contact").notNull(),
 	guardian_name: text("gardian_name").notNull(),
-	team_id: text("team_id")
-		.default("null")
-		.references(() => teams.code),
+	team_id: text("team_id").references(() => teams.code),
 });
 
 export const school_users_relations = relations(
