@@ -2,9 +2,14 @@ import { eq } from "drizzle-orm";
 import { type Elysia, t } from "elysia";
 
 import { db } from "../db";
-import { college_users, teams } from "../db/schema";
+import { college_users, teams, school_users } from "../db/schema";
 import { log } from "../log";
 import { generateRandomString } from "../utils";
+
+enum type {
+	school = "school",
+	college = "college",
+}
 
 export const team = (app: Elysia) =>
 	app.group("/team", { detail: { tags: ["team"] } }, (app) =>
@@ -16,10 +21,88 @@ export const team = (app: Elysia) =>
 					message: ctx.error.message,
 				};
 			})
+			.get(
+				"/:id",
+				async ({ set, log, params: { id } }) => {
+					log.info(`/team/${id}`);
+					const team = await db.query.teams.findFirst({
+						where: eq(teams.code, id),
+						with: {
+							event: true,
+							school_members: true,
+							college_members: true,
+						},
+					});
+					if (!team) {
+						set.status = 404;
+						return "Team not found";
+					}
+					return team;
+				},
+				{
+					params: t.Object({
+						id: t.String({
+							minLength: 8,
+							maxLength: 8,
+							error: "Invalid team id",
+						}),
+					}),
+
+					detail: {
+						summary: "Get team details",
+						description: "Get team details",
+						responses: {
+							200: { description: "Team details" },
+							404: { description: "Team not found" },
+							500: { description: "Internal server error" },
+						},
+					},
+				},
+			)
 			.post(
 				"/create",
 				async ({ set, log, headers: { userid }, body }) => {
 					log.info(`getting user details for user ${userid}`);
+
+					if (body.type === type.school) {
+						const user = await db.query.school_users.findFirst({
+							where: eq(school_users.id, userid),
+							with: {
+								team: true,
+							},
+						});
+
+						if (!user) {
+							set.status = 404;
+							return "User not found";
+						}
+
+						if (user.team) {
+							set.status = 400;
+							return "User already in a team";
+						}
+
+						const code = generateRandomString(8);
+
+						await db.insert(teams).values({
+							code,
+							leader_email: user.email,
+							leader_contact: user.contact,
+							name: body.name,
+						});
+
+						await db
+							.update(school_users)
+							.set({
+								team_id: code,
+							})
+							.where(eq(school_users.id, userid));
+
+						return {
+							message: `Team ${body.name} created`,
+							code,
+						};
+					}
 
 					const user = await db.query.college_users.findFirst({
 						where: eq(college_users.id, userid),
@@ -53,7 +136,10 @@ export const team = (app: Elysia) =>
 						})
 						.where(eq(college_users.id, userid));
 
-					return `Team ${code} created`;
+					return {
+						message: `Team ${body.name} created`,
+						code,
+					};
 				},
 				{
 					headers: t.Object({
@@ -64,6 +150,7 @@ export const team = (app: Elysia) =>
 						}),
 					}),
 					body: t.Object({
+						type: t.Enum(type),
 						name: t.String({
 							minLength: 3,
 							maxLength: 50,
@@ -85,39 +172,73 @@ export const team = (app: Elysia) =>
 				async ({ set, log, headers: { userid }, params: { id } }) => {
 					log.info(`getting user details for user ${userid}`);
 
-					const user = await db.query.college_users.findFirst({
-						where: eq(college_users.id, userid),
+					const college_user = await db.query.college_users.findFirst(
+						{
+							where: eq(college_users.id, userid),
+							with: {
+								team: true,
+							},
+						},
+					);
+
+					if (college_user) {
+						if (
+							college_user.team &&
+							college_user.team.code === id
+						) {
+							set.status = 400;
+							return "User already in a team";
+						}
+
+						const team = await db.query.teams.findFirst({
+							where: eq(teams.code, id),
+						});
+
+						if (!team) {
+							set.status = 404;
+							return "team not found";
+						}
+
+						await db
+							.update(college_users)
+							.set({
+								team_id: id,
+							})
+							.where(eq(college_users.id, userid));
+
+						return `User ${college_user.name} joined team ${team.name}`;
+					}
+
+					const school_user = await db.query.school_users.findFirst({
+						where: eq(school_users.id, userid),
 						with: {
 							team: true,
 						},
 					});
 
-					if (!user) {
-						set.status = 404;
-						return "User not found";
+					if (school_user) {
+						if (school_user.team && school_user.team.code === id) {
+							set.status = 400;
+							return "User already in a team";
+						}
+						const team = await db.query.teams.findFirst({
+							where: eq(teams.code, id),
+						});
+						if (!team) {
+							set.status = 404;
+							return "team not found";
+						}
+						await db
+							.update(school_users)
+							.set({
+								team_id: id,
+							})
+							.where(eq(school_users.id, userid));
+						return `User ${school_user.name} joined team ${team.name}`;
 					}
-					if (user.team && user.team.code === id) {
-						set.status = 400;
-						return "User already in a team";
-					}
 
-					const team = await db.query.teams.findFirst({
-						where: eq(teams.code, id),
-					});
-
-					if (!team) {
-						set.status = 404;
-						return "team not found";
-					}
-
-					await db
-						.update(college_users)
-						.set({
-							team_id: id,
-						})
-						.where(eq(college_users.id, userid));
-
-					return `user ${userid} joined team ${id}`;
+					set.status = 404;
+					return "User not found";
 				},
 				{
 					headers: t.Object({
@@ -147,44 +268,75 @@ export const team = (app: Elysia) =>
 			.post(
 				"/leave",
 				async ({ set, log, headers: { userid, teamid } }) => {
-					const user = await db.query.college_users.findFirst({
-						where: eq(college_users.id, userid),
-						with: {
-							team: true,
-						},
-					});
-
 					const team_exists = await db.query.teams.findFirst({
 						where: eq(teams.code, teamid),
 					});
-
-					if (!user) {
-						set.status = 404;
-						return "User not found";
-					}
-					if (user.team && user.team.code !== teamid) {
-						set.status = 400;
-						return "User not in a team";
-					}
 
 					if (!team_exists) {
 						set.status = 404;
 						return "Team not found";
 					}
 
-					if (user.email === team_exists.leader_email) {
-						set.status = 400;
-						return "Leader cannot leave the team";
+					const college_user = await db.query.college_users.findFirst(
+						{
+							where: eq(college_users.id, userid),
+							with: {
+								team: true,
+							},
+						},
+					);
+
+					if (college_user) {
+						if (
+							college_user.team &&
+							college_user.team.code !== teamid
+						) {
+							set.status = 400;
+							return "User not in a team";
+						}
+
+						if (college_user.email === team_exists.leader_email) {
+							set.status = 400;
+							return "Leader cannot leave the team";
+						}
+
+						await db
+							.update(college_users)
+							.set({
+								team_id: null,
+							})
+							.where(eq(college_users.id, userid));
+
+						return `User ${college_user.email} left team ${team_exists.name}`;
 					}
 
-					await db
-						.update(college_users)
-						.set({
-							team_id: null,
-						})
-						.where(eq(college_users.id, userid));
+					const school_user = await db.query.school_users.findFirst({
+						where: eq(school_users.id, userid),
+						with: {
+							team: true,
+						},
+					});
 
-					return `User ${user.email} left team ${team_exists.name}`;
+					if (school_user) {
+						if (
+							school_user.team &&
+							school_user.team.code !== teamid
+						) {
+							set.status = 400;
+							return "User not in a team";
+						}
+						if (school_user.email === team_exists.leader_email) {
+							set.status = 400;
+							return "Leader cannot leave the team";
+						}
+						await db
+							.update(school_users)
+							.set({
+								team_id: null,
+							})
+							.where(eq(school_users.id, userid));
+						return `User ${school_user.email} left team ${team_exists.name}`;
+					}
 				},
 				{
 					headers: t.Object({
@@ -221,23 +373,47 @@ export const team = (app: Elysia) =>
 						return "Team not found or user not logged in";
 					}
 
-					const user = await db.query.college_users.findFirst({
-						where: eq(college_users.id, userid),
-					});
+					const college_user = await db.query.college_users.findFirst(
+						{
+							where: eq(college_users.id, userid),
+						},
+					);
 
-					if (user && user.email !== team_exists.leader_email) {
-						set.status = 401;
-						return "User not authorized to delete the team";
+					if (college_user) {
+						if (college_user.email !== team_exists.leader_email) {
+							set.status = 401;
+							return "User not authorized to delete the team";
+						}
+
+						await db
+							.update(college_users)
+							.set({ team_id: null })
+							.where(eq(college_users.team_id, id));
+
+						await db.delete(teams).where(eq(teams.code, id));
+
+						return `Team ${team_exists.name} deleted`;
 					}
 
-					await db
-						.update(college_users)
-						.set({ team_id: null })
-						.where(eq(college_users.team_id, id));
+					const school_user = await db.query.school_users.findFirst({
+						where: eq(school_users.id, userid),
+					});
 
-					await db.delete(teams).where(eq(teams.code, id));
+					if (school_user) {
+						if (school_user.email !== team_exists.leader_email) {
+							set.status = 401;
+							return "User not authorized to delete the team";
+						}
 
-					return `Team ${team_exists.name} deleted`;
+						await db
+							.update(school_users)
+							.set({ team_id: null })
+							.where(eq(school_users.team_id, id));
+
+						await db.delete(teams).where(eq(teams.code, id));
+
+						return `Team ${team_exists.name} deleted`;
+					}
 				},
 				{
 					params: t.Object({
