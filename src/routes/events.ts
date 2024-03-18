@@ -43,9 +43,11 @@ export const event = (app: Elysia) =>
 					log.info(`/event/join/${id}`);
 
 					if (
-						id === category.math ||
-						id === category.extempore_jr ||
-						id === category.painting_jr
+						(id === category.math ||
+							id === category.extempore_jr ||
+							id === category.painting_jr ||
+							id === category.science_exhibition) &&
+						body.school_user_id
 					) {
 						log.info("solo school event");
 						if (!body.school_user_id) {
