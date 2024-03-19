@@ -191,6 +191,10 @@ export const team = (app: Elysia) =>
 
 						const team = await db.query.teams.findFirst({
 							where: eq(teams.code, id),
+							with: {
+								college_members: true,
+								school_members: true,
+							},
 						});
 
 						if (!team) {
@@ -198,17 +202,27 @@ export const team = (app: Elysia) =>
 							throw new Error("Team not found");
 						}
 
-						await db
-							.update(college_users)
-							.set({
-								team_id: id,
-							})
-							.where(eq(college_users.id, userid));
+						if (
+							team.college_members.length >= 1 &&
+							team.school_members.length === 0
+						) {
+							await db
+								.update(college_users)
+								.set({
+									team_id: id,
+								})
+								.where(eq(college_users.id, userid));
 
-						return {
-							message: `User ${college_user.name} joined team ${team.name}`,
-							code: team.code,
-						};
+							return {
+								message: `User ${college_user.name} joined team ${team.name}`,
+								code: team.code,
+							};
+						}
+
+						set.status = 400;
+						throw new Error(
+							"College students can't join school teams",
+						);
 					}
 
 					const school_user = await db.query.school_users.findFirst({
@@ -227,6 +241,11 @@ export const team = (app: Elysia) =>
 						}
 						const team = await db.query.teams.findFirst({
 							where: eq(teams.code, id),
+
+							with: {
+								college_members: true,
+								school_members: true,
+							},
 						});
 						if (!team) {
 							set.status = 404;
@@ -234,15 +253,26 @@ export const team = (app: Elysia) =>
 								message: "Team not found",
 							};
 						}
-						await db
-							.update(school_users)
-							.set({
-								team_id: id,
-							})
-							.where(eq(school_users.id, userid));
+
+						if (
+							team.school_members.length >= 1 &&
+							team.college_members.length === 0
+						) {
+							await db
+								.update(school_users)
+								.set({
+									team_id: id,
+								})
+								.where(eq(school_users.id, userid));
+							return {
+								message: `User ${school_user.name} joined team ${team.name}`,
+								code: team.code,
+							};
+						}
+
+						set.status = 400;
 						return {
-							message: `User ${school_user.name} joined team ${team.name}`,
-							code: team.code,
+							message: "School students can't join college teams",
 						};
 					}
 
