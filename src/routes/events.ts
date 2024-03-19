@@ -43,14 +43,15 @@ export const event = (app: Elysia) =>
 					log.info(`/event/join/${id}`);
 
 					if (
-						id === category.math ||
-						id === category.extempore_jr ||
-						id === category.painting_jr
+						(id === category.math ||
+							id === category.extempore_jr ||
+							id === category.painting_jr) &&
+						body.school_user_id
 					) {
 						log.info("solo school event");
 						if (!body.school_user_id) {
 							set.status = 400;
-							throw new Error("school_user_id is required");
+							throw new Error("User not logged in");
 						}
 
 						const school_user =
@@ -62,7 +63,7 @@ export const event = (app: Elysia) =>
 							});
 
 						if (!school_user) {
-							set.status = 400;
+							set.status = 404;
 							throw new Error("User not found");
 						}
 
@@ -94,7 +95,7 @@ export const event = (app: Elysia) =>
 					if (id === category.science_exhibition) {
 						if (!body.team_id) {
 							set.status = 400;
-							throw new Error("team_id is required");
+							throw new Error("Create a Team first");
 						}
 
 						const team = await db.query.teams.findFirst({
@@ -107,48 +108,50 @@ export const event = (app: Elysia) =>
 						});
 
 						if (!team) {
-							set.status = 400;
+							set.status = 404;
 							throw new Error("Team not found");
 						}
 
-						if (
-							team.school_members.length >= 1 &&
-							team.school_members.length <= 2
-						) {
+						if (team.school_members.length === 0) {
 							set.status = 400;
-							throw new Error(
-								"School team must have 1 - 2 members",
-							);
+							throw new Error("Not a school team 🤯");
 						}
 
-						if (team.event.some((obj) => obj.category === id)) {
+						if (
+							team.school_members.length >= 2 &&
+							team.school_members.length <= 3
+						) {
+							if (team.event.some((obj) => obj.category === id)) {
+								return {
+									message: "Already joined",
+								};
+							}
+
+							await db.insert(events).values({
+								category: id,
+								team_id: body.team_id,
+							});
+
+							await sendEmail(
+								team.name,
+								team.leader_email,
+								`Successfully joined ${id} event`,
+								`You have successfully joined ${id} event. We wish you all the best 🎉\n\n and you can contact us for any queries.`,
+							);
+
 							return {
-								message: "Already joined",
+								message: "Successfully joined",
 							};
 						}
 
-						await db.insert(events).values({
-							category: id,
-							team_id: body.team_id,
-						});
-
-						sendEmail(
-							team.name,
-							team.leader_email,
-							`Successfully joined ${id} event`,
-							`You have successfully joined ${id} event. We wish you all the best 🎉\n\n and you can contact us for any queries.`,
-						);
-
-						return {
-							message: "Successfully joined",
-						};
+						set.status = 400;
+						throw new Error("Team must have 2 - 3 members");
 					}
 
 					if (
 						(id === category.extempore_sr ||
 							id === category.painting_sr ||
 							id === category.creative_writing ||
-							id === category.circuits ||
 							id === category.frontend ||
 							id === category.ui_ux) &&
 						body.college_user_id
@@ -156,7 +159,7 @@ export const event = (app: Elysia) =>
 						log.info(`solo college ${id} event`);
 						if (!body.college_user_id) {
 							set.status = 400;
-							throw new Error("college_user_id is required");
+							throw new Error("User not logged in");
 						}
 
 						log.info(body.college_user_id);
@@ -173,7 +176,7 @@ export const event = (app: Elysia) =>
 							});
 
 						if (!college_user) {
-							set.status = 400;
+							set.status = 404;
 							throw new Error("User not found");
 						}
 
@@ -205,9 +208,7 @@ export const event = (app: Elysia) =>
 					}
 
 					if (
-						id === category.frontend ||
 						id === category.circuits ||
-						id === category.ui_ux ||
 						id === category.ctf ||
 						id === category.webathon ||
 						id === category.treasure_hunt ||
@@ -219,7 +220,7 @@ export const event = (app: Elysia) =>
 					) {
 						if (!body.team_id) {
 							set.status = 400;
-							throw new Error("team_id is required");
+							throw new Error("Create a Team first");
 						}
 
 						const team = await db.query.teams.findFirst({
@@ -232,17 +233,11 @@ export const event = (app: Elysia) =>
 						});
 
 						if (!team) {
-							set.status = 400;
+							set.status = 404;
 							throw new Error("Team not found");
 						}
 
 						if (
-							(id === category.frontend &&
-								team.college_members.length <= 2 &&
-								team.college_members.length >= 1) ||
-							(id === category.ui_ux &&
-								team.college_members.length <= 2 &&
-								team.college_members.length >= 1) ||
 							(id === category.ctf &&
 								team.college_members.length <= 4 &&
 								team.college_members.length >= 3) ||
@@ -262,8 +257,8 @@ export const event = (app: Elysia) =>
 								team.college_members.length <= 3 &&
 								team.college_members.length >= 2) ||
 							(id === category.circuits &&
-								team.college_members.length <= 2 &&
-								team.college_members.length >= 1) ||
+								team.college_members.length <= 3 &&
+								team.college_members.length >= 2) ||
 							(id === category.cad &&
 								team.college_members.length <= 3 &&
 								team.college_members.length >= 2) ||
@@ -282,7 +277,7 @@ export const event = (app: Elysia) =>
 								team_id: body.team_id,
 							});
 
-							sendEmail(
+							await sendEmail(
 								team.name,
 								team.leader_email,
 								`Successfully joined ${id} event`,
@@ -299,6 +294,11 @@ export const event = (app: Elysia) =>
 							message: "Invalid Team Member Count",
 						};
 					}
+
+					set.status = 400;
+					return {
+						message: "How did you get here? 🤔",
+					};
 				},
 				{
 					params: t.Object({

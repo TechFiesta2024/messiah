@@ -51,6 +51,8 @@ export const user = (app: Elysia) =>
 							return {
 								message: "Successfully updated",
 								id: userExists.id,
+								type: "school",
+								teamId: userExists.team_id,
 							};
 						}
 
@@ -59,6 +61,8 @@ export const user = (app: Elysia) =>
 						return {
 							message: `Welcome back ${userExists.name}`,
 							id: userExists.id,
+							type: "school",
+							teamId: userExists.team_id,
 						};
 					}
 
@@ -68,11 +72,7 @@ export const user = (app: Elysia) =>
 							id: randomUUID(),
 							...body,
 						})
-						.returning({
-							userid: school_users.id,
-							name: school_users.name,
-							email: school_users.email,
-						});
+						.returning();
 
 					await sendEmail(
 						newUser[0].name,
@@ -85,7 +85,9 @@ export const user = (app: Elysia) =>
 
 					return {
 						message: `Welcome ${newUser[0].name}`,
-						id: newUser[0].userid,
+						id: newUser[0].id,
+						type: "school",
+						teamId: newUser[0].team_id,
 					};
 				},
 				{
@@ -180,6 +182,8 @@ export const user = (app: Elysia) =>
 							return {
 								message: "Successfully updated",
 								id: userExists.id,
+								type: "college",
+								teamId: userExists.team_id,
 							};
 						}
 
@@ -188,6 +192,8 @@ export const user = (app: Elysia) =>
 						return {
 							message: `Welcome back ${userExists.name}`,
 							id: userExists.id,
+							type: "college",
+							teamId: userExists.team_id,
 						};
 					}
 
@@ -197,11 +203,7 @@ export const user = (app: Elysia) =>
 							id: randomUUID(),
 							...body,
 						})
-						.returning({
-							userid: college_users.id,
-							name: college_users.name,
-							email: college_users.email,
-						});
+						.returning();
 
 					log.info(`new user ${newUser[0].email} logged in`);
 
@@ -214,7 +216,9 @@ export const user = (app: Elysia) =>
 
 					return {
 						message: `Welcome ${newUser[0].name}`,
-						id: newUser[0].userid,
+						id: newUser[0].id,
+						type: "college",
+						teamId: newUser[0].team_id,
 					};
 				},
 				{
