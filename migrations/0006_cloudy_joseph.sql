@@ -1,0 +1,1 @@
+ALTER TABLE "teams" DROP CONSTRAINT "teams_leader_contact_unique";

@@ -36,6 +36,20 @@
       "when": 1710783245828,
       "tag": "0004_yummy_unicorn",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1710849075588,
+      "tag": "0005_gigantic_vance_astro",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1710859101684,
+      "tag": "0006_cloudy_joseph",
+      "breakpoints": true
     }
   ]
 }
