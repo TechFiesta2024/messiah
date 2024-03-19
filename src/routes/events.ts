@@ -112,9 +112,14 @@ export const event = (app: Elysia) =>
 							throw new Error("Team not found");
 						}
 
+						if (team.school_members.length === 0) {
+							set.status = 400;
+							throw new Error("Not a school team 🤯");
+						}
+
 						if (
-							team.school_members.length >= 1 &&
-							team.school_members.length <= 2
+							team.school_members.length >= 2 &&
+							team.school_members.length <= 3
 						) {
 							if (team.event.some((obj) => obj.category === id)) {
 								return {
