@@ -112,7 +112,7 @@ export const event = (app: Elysia) =>
 						if (!team) {
 							set.status = 404;
 							throw new Error(
-								"Team not found. From the dashboard",
+								"Team not found. Create a team from the dashboard",
 							);
 						}
 
