@@ -35,7 +35,9 @@ export const team = (app: Elysia) =>
 					});
 					if (!team) {
 						set.status = 404;
-						return "Team not found";
+						return {
+							message: "Team not found",
+						};
 					}
 					return team;
 				},
