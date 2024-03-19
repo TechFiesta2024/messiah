@@ -81,7 +81,7 @@ export const team = (app: Elysia) =>
 
 						if (user.team) {
 							set.status = 400;
-							return "User already in a team";
+							throw new Error("User already in a team");
 						}
 
 						const code = generateRandomString(8);
@@ -115,11 +115,11 @@ export const team = (app: Elysia) =>
 
 					if (!user) {
 						set.status = 404;
-						return "User not found";
+						throw new Error("User not found");
 					}
 					if (user.team) {
 						set.status = 400;
-						return "User already in a team";
+						throw new Error("User already in a team");
 					}
 
 					const code = generateRandomString(8);
@@ -184,12 +184,9 @@ export const team = (app: Elysia) =>
 					);
 
 					if (college_user) {
-						if (
-							college_user.team &&
-							college_user.team.code === id
-						) {
+						if (college_user.team) {
 							set.status = 400;
-							return "User already in a team";
+							throw new Error("User already in a team");
 						}
 
 						const team = await db.query.teams.findFirst({
@@ -198,7 +195,7 @@ export const team = (app: Elysia) =>
 
 						if (!team) {
 							set.status = 404;
-							return "team not found";
+							throw new Error("Team not found");
 						}
 
 						await db
@@ -224,14 +221,18 @@ export const team = (app: Elysia) =>
 					if (school_user) {
 						if (school_user.team && school_user.team.code === id) {
 							set.status = 400;
-							return "User already in a team";
+							return {
+								message: "User already in a team",
+							};
 						}
 						const team = await db.query.teams.findFirst({
 							where: eq(teams.code, id),
 						});
 						if (!team) {
 							set.status = 404;
-							return "team not found";
+							return {
+								message: "Team not found",
+							};
 						}
 						await db
 							.update(school_users)
@@ -282,7 +283,7 @@ export const team = (app: Elysia) =>
 
 					if (!team_exists) {
 						set.status = 404;
-						return "Team not found";
+						return { message: "Team not found" };
 					}
 
 					const college_user = await db.query.college_users.findFirst(
@@ -300,12 +301,12 @@ export const team = (app: Elysia) =>
 							college_user.team.code !== teamid
 						) {
 							set.status = 400;
-							return "User not in a team";
+							return { message: "User not in a team" };
 						}
 
 						if (college_user.email === team_exists.leader_email) {
 							set.status = 400;
-							return "Leader cannot leave the team";
+							return { message: "Leader cannot leave the team" };
 						}
 
 						await db
@@ -315,7 +316,9 @@ export const team = (app: Elysia) =>
 							})
 							.where(eq(college_users.id, userid));
 
-						return `User ${college_user.email} left team ${team_exists.name}`;
+						return {
+							message: `User ${college_user.email} left team ${team_exists.name}`,
+						};
 					}
 
 					const school_user = await db.query.school_users.findFirst({
@@ -331,11 +334,11 @@ export const team = (app: Elysia) =>
 							school_user.team.code !== teamid
 						) {
 							set.status = 400;
-							return "User not in a team";
+							return { message: "User not in a team" };
 						}
 						if (school_user.email === team_exists.leader_email) {
 							set.status = 400;
-							return "Leader cannot leave the team";
+							return { message: "Leader cannot leave the team" };
 						}
 						await db
 							.update(school_users)
@@ -343,7 +346,9 @@ export const team = (app: Elysia) =>
 								team_id: null,
 							})
 							.where(eq(school_users.id, userid));
-						return `User ${school_user.email} left team ${team_exists.name}`;
+						return {
+							message: `User ${school_user.email} left team ${team_exists.name}`,
+						};
 					}
 				},
 				{
@@ -378,7 +383,9 @@ export const team = (app: Elysia) =>
 
 					if (!team_exists || !userid) {
 						set.status = 404;
-						return "Team not found or user not logged in";
+						return {
+							message: "Team not found or user not logged in",
+						};
 					}
 
 					const college_user = await db.query.college_users.findFirst(
@@ -390,7 +397,10 @@ export const team = (app: Elysia) =>
 					if (college_user) {
 						if (college_user.email !== team_exists.leader_email) {
 							set.status = 401;
-							return "User not authorized to delete the team";
+							return {
+								message:
+									"User not authorized to delete the team",
+							};
 						}
 
 						await db
@@ -400,7 +410,7 @@ export const team = (app: Elysia) =>
 
 						await db.delete(teams).where(eq(teams.code, id));
 
-						return `Team ${team_exists.name} deleted`;
+						return { message: `Team ${team_exists.name} deleted` };
 					}
 
 					const school_user = await db.query.school_users.findFirst({
@@ -410,7 +420,10 @@ export const team = (app: Elysia) =>
 					if (school_user) {
 						if (school_user.email !== team_exists.leader_email) {
 							set.status = 401;
-							return "User not authorized to delete the team";
+							return {
+								message:
+									"User not authorized to delete the team",
+							};
 						}
 
 						await db
@@ -420,7 +433,7 @@ export const team = (app: Elysia) =>
 
 						await db.delete(teams).where(eq(teams.code, id));
 
-						return `Team ${team_exists.name} deleted`;
+						return { message: `Team ${team_exists.name} deleted` };
 					}
 				},
 				{

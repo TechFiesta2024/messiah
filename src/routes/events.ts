@@ -95,7 +95,9 @@ export const event = (app: Elysia) =>
 					if (id === category.science_exhibition) {
 						if (!body.team_id) {
 							set.status = 400;
-							throw new Error("Create a Team first");
+							throw new Error(
+								"Create a Team first. From the dashboard",
+							);
 						}
 
 						const team = await db.query.teams.findFirst({
@@ -109,7 +111,9 @@ export const event = (app: Elysia) =>
 
 						if (!team) {
 							set.status = 404;
-							throw new Error("Team not found");
+							throw new Error(
+								"Team not found. From the dashboard",
+							);
 						}
 
 						if (team.school_members.length === 0) {
