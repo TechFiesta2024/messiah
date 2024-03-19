@@ -239,7 +239,10 @@ export const team = (app: Elysia) =>
 								team_id: id,
 							})
 							.where(eq(school_users.id, userid));
-						return `User ${school_user.name} joined team ${team.name}`;
+						return {
+							message: `User ${school_user.name} joined team ${team.name}`,
+							code: team.code,
+						};
 					}
 
 					set.status = 404;
