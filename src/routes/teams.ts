@@ -208,7 +208,10 @@ export const team = (app: Elysia) =>
 							})
 							.where(eq(college_users.id, userid));
 
-						return `User ${college_user.name} joined team ${team.name}`;
+						return {
+							message: `User ${college_user.name} joined team ${team.name}`,
+							code: team.code,
+						};
 					}
 
 					const school_user = await db.query.school_users.findFirst({
