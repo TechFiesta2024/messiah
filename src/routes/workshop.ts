@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { type Elysia, t } from "elysia";
 
 import { db } from "../db";
-import { school_users, college_users, workshops } from "../db/schema";
+import { college_users, school_users, workshops } from "../db/schema";
 import { sendEmail } from "../email";
 import {
 	backend_deploy_email,
@@ -53,23 +53,27 @@ export const workshop = (app: Elysia) =>
 					});
 
 					if (school_user) {
-						set.status = 401
-						throw new Error("School users can't join workshop")
+						set.status = 401;
+						throw new Error("School users can't join workshop");
 					}
 
-					const college_user = await db.query.college_users.findFirst({
-						where: eq(college_users.id, userid),
-						with: {
-							workshop: true,
+					const college_user = await db.query.college_users.findFirst(
+						{
+							where: eq(college_users.id, userid),
+							with: {
+								workshop: true,
+							},
 						},
-					});
+					);
 
 					if (!college_user) {
 						set.status = 403;
 						throw new Error("User not found");
 					}
 
-					if (college_user.workshop.some((obj) => obj.category === id)) {
+					if (
+						college_user.workshop.some((obj) => obj.category === id)
+					) {
 						return {
 							message: "Already joined",
 						};

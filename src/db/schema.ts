@@ -57,8 +57,8 @@ export const workshop_relations = relations(workshops, ({ one }) => ({
 
 export const teams = pgTable("teams", {
 	name: text("name").notNull(),
-	leader_email: text("leader_email").notNull().unique(),
-	leader_contact: text("leader_contact").notNull().unique(),
+	leader_email: text("leader_email").notNull(),
+	leader_contact: text("leader_contact").notNull(),
 	code: text("code").notNull().unique(),
 });
 

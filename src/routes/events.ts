@@ -155,9 +155,7 @@ export const event = (app: Elysia) =>
 					if (
 						(id === category.extempore_sr ||
 							id === category.painting_sr ||
-							id === category.creative_writing ||
-							id === category.frontend ||
-							id === category.ui_ux) &&
+							id === category.creative_writing) &&
 						body.college_user_id
 					) {
 						log.info(`solo college ${id} event`);
@@ -214,6 +212,8 @@ export const event = (app: Elysia) =>
 					if (
 						id === category.circuits ||
 						id === category.ctf ||
+						id === category.frontend ||
+						id === category.ui_ux ||
 						id === category.webathon ||
 						id === category.treasure_hunt ||
 						id === category.maze_solver ||
@@ -242,33 +242,8 @@ export const event = (app: Elysia) =>
 						}
 
 						if (
-							(id === category.ctf &&
-								team.college_members.length <= 4 &&
-								team.college_members.length >= 3) ||
-							(id === category.webathon &&
-								team.college_members.length <= 5 &&
-								team.college_members.length >= 3) ||
-							(id === category.treasure_hunt &&
-								team.college_members.length <= 3 &&
-								team.college_members.length >= 2) ||
-							(id === category.maze_solver &&
-								team.college_members.length <= 4 &&
-								team.college_members.length >= 2) ||
-							(id === category.race &&
-								team.college_members.length <= 4 &&
-								team.college_members.length >= 2) ||
-							(id === category.iot &&
-								team.college_members.length <= 3 &&
-								team.college_members.length >= 2) ||
-							(id === category.circuits &&
-								team.college_members.length <= 3 &&
-								team.college_members.length >= 2) ||
-							(id === category.cad &&
-								team.college_members.length <= 3 &&
-								team.college_members.length >= 2) ||
-							(id === category.waste_to_art &&
-								team.college_members.length <= 5 &&
-								team.college_members.length >= 3)
+							team.college_members.length <= 5 &&
+							team.college_members.length >= 2
 						) {
 							if (team.event.some((obj) => obj.category === id)) {
 								return {
