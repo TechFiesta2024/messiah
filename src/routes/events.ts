@@ -95,7 +95,9 @@ export const event = (app: Elysia) =>
 					if (id === category.science_exhibition) {
 						if (!body.team_id) {
 							set.status = 400;
-							throw new Error("Create a Team first");
+							throw new Error(
+								"Create a Team first. From the dashboard",
+							);
 						}
 
 						const team = await db.query.teams.findFirst({
@@ -109,7 +111,9 @@ export const event = (app: Elysia) =>
 
 						if (!team) {
 							set.status = 404;
-							throw new Error("Team not found");
+							throw new Error(
+								"Team not found. Create a team from the dashboard",
+							);
 						}
 
 						if (team.school_members.length === 0) {
@@ -238,33 +242,17 @@ export const event = (app: Elysia) =>
 						}
 
 						if (
-							(id === category.ctf &&
-								team.college_members.length <= 4 &&
-								team.college_members.length >= 3) ||
-							(id === category.webathon &&
-								team.college_members.length <= 5 &&
-								team.college_members.length >= 3) ||
-							(id === category.treasure_hunt &&
-								team.college_members.length <= 3 &&
-								team.college_members.length >= 2) ||
-							(id === category.maze_solver &&
-								team.college_members.length <= 4 &&
-								team.college_members.length >= 2) ||
-							(id === category.race &&
-								team.college_members.length <= 4 &&
-								team.college_members.length >= 2) ||
-							(id === category.iot &&
-								team.college_members.length <= 3 &&
-								team.college_members.length >= 2) ||
-							(id === category.circuits &&
-								team.college_members.length <= 3 &&
-								team.college_members.length >= 2) ||
-							(id === category.cad &&
-								team.college_members.length <= 3 &&
-								team.college_members.length >= 2) ||
-							(id === category.waste_to_art &&
-								team.college_members.length <= 5 &&
-								team.college_members.length >= 3)
+							(id === category.ctf ||
+								id === category.webathon ||
+								id === category.treasure_hunt ||
+								id === category.maze_solver ||
+								id === category.race ||
+								id === category.iot ||
+								id === category.circuits ||
+								id === category.cad ||
+								id === category.waste_to_art) &&
+							team.college_members.length <= 5 &&
+							team.college_members.length >= 3
 						) {
 							if (team.event.some((obj) => obj.category === id)) {
 								return {
