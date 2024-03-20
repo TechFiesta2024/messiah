@@ -3,20 +3,20 @@ import { type Elysia, t } from "elysia";
 
 import { db } from "../db";
 import { college_users, school_users, workshops } from "../db/schema";
-import { sendEmail } from "../email";
-import {
-	backend_deploy_email,
-	business_logic_email,
-	cad_signup_email,
-	circuit_email,
-	ctf_signup_email,
-	embedded_systems,
-	fpga_email,
-	git_github_email,
-	iot_workshop_email,
-	product_design_cycle_email,
-	robotics_email,
-} from "../emails";
+// import { sendEmail } from "../email";
+// import {
+// 	backend_deploy_email,
+// 	business_logic_email,
+// 	cad_signup_email,
+// 	circuit_email,
+// 	ctf_signup_email,
+// 	embedded_systems,
+// 	fpga_email,
+// 	git_github_email,
+// 	iot_workshop_email,
+// 	product_design_cycle_email,
+// 	robotics_email,
+// } from "../emails";
 import { log } from "../log";
 
 enum category {
@@ -101,104 +101,104 @@ export const workshop = (app: Elysia) =>
 						user_email: college_user.email,
 					});
 
-					if (id === category.product_design_lifecycle) {
-						await sendEmail(
-							college_user.name,
-							college_user.email,
-							"Successfully joined product design lifecycle workshop 🎨",
-							product_design_cycle_email,
-						);
-					}
-
-					if (id === category.git) {
-						await sendEmail(
-							college_user.name,
-							college_user.email,
-							"Successfully joined git workshop 💻",
-							git_github_email,
-						);
-					}
-
-					if (id === category.business_logic) {
-						await sendEmail(
-							college_user.name,
-							college_user.email,
-							"Successfully joined business logic workshop 📈",
-							business_logic_email,
-						);
-					}
-
-					if (id === category.backend_deploy) {
-						await sendEmail(
-							college_user.name,
-							college_user.email,
-							"Successfully joined backend deploy workshop 🚀",
-							backend_deploy_email,
-						);
-					}
-
-					if (id === category.cad) {
-						await sendEmail(
-							college_user.name,
-							college_user.email,
-							"Successfully joined cad workshop 🏠",
-							cad_signup_email,
-						);
-					}
-
-					if (id === category.ctf) {
-						await sendEmail(
-							college_user.name,
-							college_user.email,
-							"Successfully joined ctf workshop 👾",
-							ctf_signup_email,
-						);
-					}
-
-					if (id === category.fpga) {
-						await sendEmail(
-							college_user.name,
-							college_user.email,
-							"Successfully joined fpga workshop ⚡",
-							fpga_email,
-						);
-					}
-
-					if (id === category.embedded) {
-						await sendEmail(
-							college_user.name,
-							college_user.email,
-							"Successfully joined embedded systems workshop 💾",
-							embedded_systems,
-						);
-					}
-
-					if (id === category.circuits) {
-						await sendEmail(
-							college_user.name,
-							college_user.email,
-							"Successfully joined circuits workshop 💡",
-							circuit_email,
-						);
-					}
-
-					if (id === category.iot) {
-						await sendEmail(
-							college_user.name,
-							college_user.email,
-							"Successfully joined iot workshop 📡",
-							iot_workshop_email,
-						);
-					}
-
-					if (id === category.robotics) {
-						await sendEmail(
-							college_user.name,
-							college_user.email,
-							"Successfully joined robotics workshop 🤖",
-							robotics_email,
-						);
-					}
+					// if (id === category.product_design_lifecycle) {
+					// 	await sendEmail(
+					// 		college_user.name,
+					// 		college_user.email,
+					// 		"Successfully joined product design lifecycle workshop 🎨",
+					// 		product_design_cycle_email,
+					// 	);
+					// }
+					//
+					// if (id === category.git) {
+					// 	await sendEmail(
+					// 		college_user.name,
+					// 		college_user.email,
+					// 		"Successfully joined git workshop 💻",
+					// 		git_github_email,
+					// 	);
+					// }
+					//
+					// if (id === category.business_logic) {
+					// 	await sendEmail(
+					// 		college_user.name,
+					// 		college_user.email,
+					// 		"Successfully joined business logic workshop 📈",
+					// 		business_logic_email,
+					// 	);
+					// }
+					//
+					// if (id === category.backend_deploy) {
+					// 	await sendEmail(
+					// 		college_user.name,
+					// 		college_user.email,
+					// 		"Successfully joined backend deploy workshop 🚀",
+					// 		backend_deploy_email,
+					// 	);
+					// }
+					//
+					// if (id === category.cad) {
+					// 	await sendEmail(
+					// 		college_user.name,
+					// 		college_user.email,
+					// 		"Successfully joined cad workshop 🏠",
+					// 		cad_signup_email,
+					// 	);
+					// }
+					//
+					// if (id === category.ctf) {
+					// 	await sendEmail(
+					// 		college_user.name,
+					// 		college_user.email,
+					// 		"Successfully joined ctf workshop 👾",
+					// 		ctf_signup_email,
+					// 	);
+					// }
+					//
+					// if (id === category.fpga) {
+					// 	await sendEmail(
+					// 		college_user.name,
+					// 		college_user.email,
+					// 		"Successfully joined fpga workshop ⚡",
+					// 		fpga_email,
+					// 	);
+					// }
+					//
+					// if (id === category.embedded) {
+					// 	await sendEmail(
+					// 		college_user.name,
+					// 		college_user.email,
+					// 		"Successfully joined embedded systems workshop 💾",
+					// 		embedded_systems,
+					// 	);
+					// }
+					//
+					// if (id === category.circuits) {
+					// 	await sendEmail(
+					// 		college_user.name,
+					// 		college_user.email,
+					// 		"Successfully joined circuits workshop 💡",
+					// 		circuit_email,
+					// 	);
+					// }
+					//
+					// if (id === category.iot) {
+					// 	await sendEmail(
+					// 		college_user.name,
+					// 		college_user.email,
+					// 		"Successfully joined iot workshop 📡",
+					// 		iot_workshop_email,
+					// 	);
+					// }
+					//
+					// if (id === category.robotics) {
+					// 	await sendEmail(
+					// 		college_user.name,
+					// 		college_user.email,
+					// 		"Successfully joined robotics workshop 🤖",
+					// 		robotics_email,
+					// 	);
+					// }
 
 					return {
 						message: "Successfully joined",

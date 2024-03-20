@@ -3,7 +3,7 @@ import { type Elysia, t } from "elysia";
 
 import { db } from "../db";
 import { events, college_users, school_users, teams } from "../db/schema";
-import { sendEmail } from "../email";
+// import { sendEmail } from "../email";
 import { log } from "../log";
 
 enum category {
@@ -80,12 +80,12 @@ export const event = (app: Elysia) =>
 							school_user_id: body.school_user_id,
 						});
 
-						await sendEmail(
-							school_user.name,
-							school_user.email,
-							`Successfully joined ${id} event`,
-							`You have successfully joined ${id} event. We wish you all the best 🎉\n\n and you can contact us for any queries.`,
-						);
+						// await sendEmail(
+						// 	school_user.name,
+						// 	school_user.email,
+						// 	`Successfully joined ${id} event`,
+						// 	`You have successfully joined ${id} event. We wish you all the best 🎉\n\n and you can contact us for any queries.`,
+						// );
 
 						return {
 							message: "Successfully joined",
@@ -136,12 +136,12 @@ export const event = (app: Elysia) =>
 								team_id: body.team_id,
 							});
 
-							await sendEmail(
-								team.name,
-								team.leader_email,
-								`Successfully joined ${id} event`,
-								`You have successfully joined ${id} event. We wish you all the best 🎉\n\n and you can contact us for any queries.`,
-							);
+							// await sendEmail(
+							// 	team.name,
+							// 	team.leader_email,
+							// 	`Successfully joined ${id} event`,
+							// 	`You have successfully joined ${id} event. We wish you all the best 🎉\n\n and you can contact us for any queries.`,
+							// );
 
 							return {
 								message: "Successfully joined",
@@ -197,12 +197,12 @@ export const event = (app: Elysia) =>
 							college_user_id: body.college_user_id,
 						});
 
-						await sendEmail(
-							college_user.name,
-							college_user.email,
-							`Successfully joined ${id} event`,
-							`You have successfully joined ${id} event. We wish you all the best 🎉\n\n and you can contact us for any queries.`,
-						);
+						// await sendEmail(
+						// 	college_user.name,
+						// 	college_user.email,
+						// 	`Successfully joined ${id} event`,
+						// 	`You have successfully joined ${id} event. We wish you all the best 🎉\n\n and you can contact us for any queries.`,
+						// );
 
 						return {
 							message: "Successfully joined",
@@ -256,12 +256,12 @@ export const event = (app: Elysia) =>
 								team_id: body.team_id,
 							});
 
-							await sendEmail(
-								team.name,
-								team.leader_email,
-								`Successfully joined ${id} event`,
-								`You have successfully joined ${id} event. We wish you all the best 🎉\n\n and you can contact us for any queries.`,
-							);
+							// await sendEmail(
+							// 	team.name,
+							// 	team.leader_email,
+							// 	`Successfully joined ${id} event`,
+							// 	`You have successfully joined ${id} event. We wish you all the best 🎉\n\n and you can contact us for any queries.`,
+							// );
 
 							return {
 								message: "Successfully joined",
