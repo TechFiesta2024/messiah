@@ -299,8 +299,12 @@ export const team = (app: Elysia) =>
 				},
 			)
 			.post(
-				"/leave",
-				async ({ set, log, headers: { userid, teamid } }) => {
+				"/kick",
+				async ({
+					set,
+					log,
+					headers: { userid, teamid, kickme_email },
+				}) => {
 					const team_exists = await db.query.teams.findFirst({
 						where: eq(teams.code, teamid),
 					});
@@ -310,73 +314,85 @@ export const team = (app: Elysia) =>
 						throw new Error("Team not found");
 					}
 
-					const college_user = await db.query.college_users.findFirst(
-						{
+					const college_leader =
+						await db.query.college_users.findFirst({
 							where: eq(college_users.id, userid),
+							with: {
+								team: true,
+							},
+						});
+
+					if (college_leader) {
+						if (
+							college_leader.team &&
+							college_leader.team.code !== teamid
+						) {
+							set.status = 400;
+							throw new Error("User not in a team");
+						}
+
+						if (college_leader.email === team_exists.leader_email) {
+							await db
+								.update(college_users)
+								.set({
+									team_id: null,
+								})
+								.where(eq(college_users.email, kickme_email));
+
+							return {
+								message: `User ${kickme_email} left team ${team_exists.name}`,
+							};
+						}
+
+						if (college_leader.email === kickme_email) {
+							set.status = 400;
+							throw new Error("Leader cannot leave the team");
+						}
+					}
+
+					const school_leader = await db.query.school_users.findFirst(
+						{
+							where: eq(school_users.id, userid),
 							with: {
 								team: true,
 							},
 						},
 					);
 
-					if (college_user) {
+					if (school_leader) {
 						if (
-							college_user.team &&
-							college_user.team.code !== teamid
+							school_leader.team &&
+							school_leader.team.code !== teamid
 						) {
 							set.status = 400;
 							throw new Error("User not in a team");
 						}
-
-						if (college_user.email === team_exists.leader_email) {
+						if (school_leader.email === team_exists.leader_email) {
+							await db
+								.update(school_users)
+								.set({
+									team_id: null,
+								})
+								.where(eq(school_users.email, kickme_email));
+							return {
+								message: `User ${kickme_email} left team ${team_exists.name}`,
+							};
+						}
+						if (school_leader.email === kickme_email) {
 							set.status = 400;
 							throw new Error("Leader cannot leave the team");
 						}
-
-						await db
-							.update(college_users)
-							.set({
-								team_id: null,
-							})
-							.where(eq(college_users.id, userid));
-
-						return {
-							message: `User ${college_user.email} left team ${team_exists.name}`,
-						};
 					}
 
-					const school_user = await db.query.school_users.findFirst({
-						where: eq(school_users.id, userid),
-						with: {
-							team: true,
-						},
-					});
-
-					if (school_user) {
-						if (
-							school_user.team &&
-							school_user.team.code !== teamid
-						) {
-							set.status = 400;
-							throw new Error("User not in a team");
-						}
-						if (school_user.email === team_exists.leader_email) {
-							set.status = 400;
-							throw new Error("Leader cannot leave the team");
-						}
-						await db
-							.update(school_users)
-							.set({
-								team_id: null,
-							})
-							.where(eq(school_users.id, userid));
-						return {
-							message: `User ${school_user.email} left team ${team_exists.name}`,
-						};
-					}
+					set.status = 404;
+					throw new Error("User not found, try logging in again");
 				},
 				{
 					headers: t.Object({
+						kickme_email: t.String({
+							format: "email",
+							error: "Invalid email",
+						}),
 						userid: t.String({
 							minLength: 36,
 							maxLength: 36,
@@ -389,10 +405,11 @@ export const team = (app: Elysia) =>
 						}),
 					}),
 					detail: {
-						summary: "Leave a team",
-						description: "Leave a team",
+						summary: "Kick a team member",
+						description: "Kick a team member",
 						responses: {
-							200: { description: "Team left successfully" },
+							200: { description: "Successfully Kick" },
+							400: { description: "Bad request" },
 							500: { description: "Internal server error" },
 						},
 					},
@@ -403,11 +420,21 @@ export const team = (app: Elysia) =>
 				async ({ set, log, headers: { userid }, params: { id } }) => {
 					const team_exists = await db.query.teams.findFirst({
 						where: eq(teams.code, id),
+						with: {
+							event: true,
+						},
 					});
 
 					if (!team_exists || !userid) {
 						set.status = 404;
 						throw new Error("Team not found");
+					}
+
+					if (team_exists.event.length > 0) {
+						set.status = 400;
+						throw new Error(
+							"Team is participating in an event cannot delete team",
+						);
 					}
 
 					const college_user = await db.query.college_users.findFirst(
