@@ -269,24 +269,32 @@ export const event = (app: Elysia) =>
 						}
 
 						set.status = 422;
-						return {
-							message: "Invalid Team Member Count",
-						};
+						throw new Error("Team must have 2 - 5 members");
 					}
 
 					set.status = 400;
-					return {
-						message: "How did you get here? 🤔",
-					};
+					throw new Error("How did you get here? 🤔");
 				},
 				{
 					params: t.Object({
 						id: t.Enum(category),
 					}),
 					body: t.Object({
-						team_id: t.Optional(t.String()),
-						college_user_id: t.Optional(t.String()),
-						school_user_id: t.Optional(t.String()),
+						team_id: t.Optional(
+							t.String({
+								error: "Invalid Team Id, Try logging in again",
+							}),
+						),
+						college_user_id: t.Optional(
+							t.String({
+								error: "Invalid College User. Try logging in again",
+							}),
+						),
+						school_user_id: t.Optional(
+							t.String({
+								error: "Invalid School User. Try logging in again",
+							}),
+						),
 					}),
 					detail: {
 						summary: "Register for an event",
