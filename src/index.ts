@@ -9,6 +9,8 @@ import { team } from "./routes/teams";
 import { user } from "./routes/user";
 import { workshop } from "./routes/workshop";
 
+console.log("ORIGIN: ", process.env.ORIGIN);
+
 const app = new Elysia()
 	.use(
 		cors({
