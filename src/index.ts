@@ -1,5 +1,4 @@
 import { cors } from "@elysiajs/cors";
-import { swagger } from "@elysiajs/swagger";
 import { Elysia } from "elysia";
 
 import { log } from "./log";
@@ -12,17 +11,10 @@ import { workshop } from "./routes/workshop";
 
 const app = new Elysia()
 	.use(
-		swagger({
-			path: "/docs",
-			documentation: {
-				info: {
-					title: "messiah",
-					version: "0.9.0",
-				},
-			},
+		cors({
+			origin: process.env.ORIGIN,
 		}),
 	)
-	.use(cors())
 	.use(community)
 	.use(workshop)
 	.use(user)
