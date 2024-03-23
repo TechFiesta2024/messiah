@@ -12,11 +12,7 @@ import { workshop } from "./routes/workshop";
 console.log("ORIGIN: ", process.env.ORIGIN);
 
 const app = new Elysia()
-	.use(
-		cors({
-			origin: process.env.ORIGIN,
-		}),
-	)
+	.use(cors())
 	.use(community)
 	.use(workshop)
 	.use(user)
